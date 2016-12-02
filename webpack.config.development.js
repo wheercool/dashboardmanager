@@ -10,14 +10,15 @@ if (process.env.NODE_ENV !== 'test') {
   ].concat(config.entry);
 }
 
-config.devtool = '#cheap-module-eval-source-map';
+// config.devtool = '#cheap-module-eval-source-map';
 
 config.plugins = config.plugins.concat([
   new webpack.HotModuleReplacementPlugin()
 ]);
 
 config.module.loaders = config.module.loaders.concat([
-  {test: /\.jsx?$/, loaders: [ 'react-hot', 'babel'], exclude: /node_modules/}
+  {test: /\.jsx?$/, loaders: [ 'react-hot', 'babel'], exclude: /node_modules/},
+  {test: /\.css$/, loader: "style-loader!css-loader"}
 ]);
 
 module.exports = config;
