@@ -1,7 +1,10 @@
-.panel {
-  background: #eee;
-}
+/*.react-grid-item.panel {
+  border: 1px solid red;
+}*/
 
+/*.clearfix-container {
+    overflow: hidden;
+}*/
 .channel-group {
     border: 1px solid red;
     float: left;

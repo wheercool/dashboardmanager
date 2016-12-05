@@ -4,15 +4,23 @@ import ReactDOM from 'react-dom';
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout';
 import {trace, log, elementSize} from '../../utils'
 import LineChartWidget from '../LineChartWidget/LineChartWidget'
+import WidgetPanel from '../WidgetPanel/WidgetPanel'
 
 const Layout = WidthProvider(ReactGridLayout);
 
+const widgetSize = (el) => {
+    const headerSize = 41;
+    const scrollHeight = 20;
+    var size = elementSize(el);
+
+    return  {
+        width: size.width,
+        height: size.height - headerSize - scrollHeight
+    }
+}
+
 const Dashboard = React.createClass({    
     render() {
-
-        const btn = (isEditing, id) => {
-            return isEditing?<button onClick={this.props.onPanelRemove.bind(this, id)}>Remove</button>: null;
-        }
         const groups = [{
             channels: [{
                 name: 'Pressure',
@@ -50,17 +58,26 @@ const Dashboard = React.createClass({
             return (<LineChartWidget width={this.props.panels[id].width} height={this.props.panels[id].height} groups={groups} /> )
         }
 
+        const {isEditing, layout, onPanelRemove} = this.props;
         return (
              <Layout className="layout" 
-                layout={this.props.layout}
-                 isDraggable={this.props.isEditing} 
-                 isResizable={this.props.isEditing} 
+                layout={layout}
+                 isDraggable={isEditing} 
+                 isResizable={isEditing} 
 
                  cols={12} rowHeight={30} width={1200}
                  onResizeStop={this.onResizeStop}              
                  onLayoutChange={this.props.onLayoutChanged}>
                  {
-                    this.props.layout.map(d => (<div id={'panel-' + d.i} key={d.i} className="panel">{panelContent('panel-' + d.i)}{btn(this.props.isEditing, d.i)}</div>))
+                    this.props.layout.map(d => 
+                        (<WidgetPanel 
+                            id={d.i} 
+                            title="History Data" key={d.i} 
+                            className="panel" 
+                            isEditing={isEditing}
+                            onPanelRemove={onPanelRemove}>
+                                {panelContent(d.i)}
+                        </WidgetPanel>))
                  }
                
              </Layout>
@@ -68,11 +85,11 @@ const Dashboard = React.createClass({
     },
     onResizeStop(layout, oldItem, newItem, p, e, element) {        
         let panel = element.parentElement,           
-            id = 'panel-' + newItem.i,
+            id = newItem.i,
 
             placeholderElement = document.querySelector('.react-grid-placeholder');
 
-            this.props.onPanelSizeChanged(id, elementSize(placeholderElement))            
+            this.props.onPanelSizeChanged(id, widgetSize(placeholderElement))            
         
     },
     componentDidMount() {
@@ -81,10 +98,12 @@ const Dashboard = React.createClass({
             let container = ReactDOM.findDOMNode(this),
                 panels = container.children,
                 arg = {},
-                i, idx;
-            for (i = 0; i < panels.length; i++) {
-                idx = panels[i].getAttribute('id')   
-                arg[idx] = elementSize(panels[i])
+                i, idx, size;            
+
+            for (i = 0; i < panels.length; i++) {                
+                idx = panels[i].getAttribute('id');
+                
+                arg[idx] = widgetSize(panels[i])
             }        
             this.props.onPanelsSizeInit(arg)
         }, 200);

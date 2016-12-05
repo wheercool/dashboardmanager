@@ -7,9 +7,9 @@ class DashboardManager extends Component {
     super(props);
     
     var layout = [
-          {i: "0", x: 0, y: 0, w: 6, h: 12},
-          {i: "1", x: 7, y: 0, w: 6, h: 12},
-          {i: "2", x: 0, y: 1, w: 12, h: 12}
+          {i: "panel-0", x: 0, y: 0, w: 6, h: 12},
+          {i: "panel-1", x: 7, y: 0, w: 6, h: 12},
+          {i: "panel-2", x: 0, y: 1, w: 12, h: 12}
         ];
     this.state = {
       panels: {},
@@ -63,6 +63,7 @@ class DashboardManager extends Component {
    }
 
   onRemove(id) {
+    debugger;
 
     this.setState({
       layout: this.state.layout.filter(d => d.i != id)
@@ -76,7 +77,7 @@ class DashboardManager extends Component {
   }
 
   onAdd() {
-    this.state.layout.push({i: (this.state.lastId++).toString(), x: 0, y: 6, w: 12, h:12 })
+    this.state.layout.push({i: "panel-" + (this.state.lastId++).toString(), x: 0, y: 6, w: 12, h:12 })
     this.setState({
       layout: this.state.layout
     })
