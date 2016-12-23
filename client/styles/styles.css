@@ -1,6 +1,6 @@
-/*.react-grid-item.panel {
-  border: 1px solid red;
-}*/
+.react-grid-item.panel {
+  /*overflow: auto;*/
+}
 
 /*.clearfix-container {
     overflow: hidden;

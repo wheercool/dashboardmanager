@@ -14,8 +14,8 @@ class LineChartGroups extends Component {
         )
     }
     renderGroupChart(group, id) {
-        var data = [[0, 1], [1, 3]]
-        return (<LineChart key={id} data={data}/>)
+        var data = group.data || [[0, 1], [1, 3]]
+        return (<LineChart key={id} data={data} channels={group.channels}/>)
     }    
 }
 

@@ -17,7 +17,15 @@ export function elementSize(e) {
 export function copy(v) {
     return Object.assign({}, v);
 }
+
 export function copyList(ar)  {
   return ar.map(d => Object.assign({}, d));
 }
 
+export function delay(ms, value) {
+    var promise = new Promise(function(accept, reject) {
+        setTimeout(accept(value), ms);    
+    })
+    return promise;
+    
+}

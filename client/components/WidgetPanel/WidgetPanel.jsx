@@ -3,7 +3,7 @@ import '../../styles/widget-panel.css'
 import CloseButton from '../Buttons/CloseButton'
 import SettingButton from '../Buttons/SettingButton'
 import AvailableWidgets from '../Widgets/AvailableWidgets'
-
+import LineChartSetting from '../Widgets/LineChartSetting'
 import {trace} from '../../utils'
 
 class WidgetPanel extends Component {
@@ -20,7 +20,7 @@ class WidgetPanel extends Component {
                     <div className="panel-body">
                         {
                             isEditing? (
-                                    <AvailableWidgets />
+                                    <LineChartSetting />
                                 )
                             :this.props.children
                         }
