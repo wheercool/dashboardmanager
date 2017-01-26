@@ -14,9 +14,22 @@ class LineChart extends Component {
         
     }
     render() {
+     
+
+      const getY = R.last
+      const getYSeries = R.map(getY)
+      const getYData = getYSeries//R.pipe(R.map(getXSeries), R.flatten)
+      const maximum = R.reduce(R.max, -Infinity)
+      const minimum = R.reduce(R.min, Infinity)
+      const maxY = R.pipe(getYData, maximum)
+      const minY = R.pipe(getYData, minimum)
+      const extentX = d => [minY(d), maxY(d)]
         if (this.state.chart) {
-            this.state.chart.resize(this.state.chart.getOption('width'), this.state.chart.getOption('height'))
-            this.state.chart.updateOptions({'file': this.props.data})
+            this.state.chart.resize(this.state.chart.getOption('width') - 30, this.state.chart.getOption('height'));
+            this.state.chart.updateOptions({
+                  'file':  this.props.data,
+                  'valueRange': extentX(this.props.data)
+                })
         }
         return (
             <div className="chart">                
@@ -26,13 +39,19 @@ class LineChart extends Component {
     componentDidMount() {        
         let element = ReactDOM.findDOMNode(this);
         const {channels} = this.props;
+
         const indexBySeries = R.indexBy(R.prop('name'));
+
         const addPlotter = channel => R.assoc('plotter', function(e) {
-            
-            var scale = scaleLinear().domain([channel.minValue, channel.maxValue]).range([e.plotArea.h, 0])
-            e.points.forEach(function(p) {                
-                p.canvasy = scale(p.yval);
-            })
+            const {minValue, maxValue} = channel;
+            const getVisiblePoints = R.filter(d => d >= minValue && d <= maxValue);
+        // var scale = scaleLinear().domain([channel.minValue, channel.maxValue]).range([e.plotArea.h, 0])
+            var scale = scaleLinear().domain([channel.minValue, channel.maxValue]).range([0, e.plotArea.w]);
+            // e.points = getVisiblePoints(e.points);
+            e.points.forEach(function(p) {
+                // p.canvasy = scale(p.yval);
+                p.canvasx = scale(p.xval);
+            });
             Dygraph.Plotters.linePlotter(e);
         }, channel);
 
@@ -44,16 +63,20 @@ class LineChart extends Component {
 
         this.state.chart = new Dygraph(element, this.props.data, {
                 labels: getLabels(channels),
+                dateWindow: [0, 1], //x-axis range
                 axes: {
                         y: {
                             drawAxis: true,                        
                             drawGrid: false,
-                            pixelsPerLabel: 60
+                            pixelsPerLabel: 60,
+                            // valueRange: [1, 111]
                         },
                         x: {
+                            connectSeparatedPoints: true,
                             pixelsPerLabel: 30, 
-                            drawAxis: true,
+                            drawAxis: false,
                             drawGrid: true,
+                            // axisLabelFormatter: () => ""
 
                         }                    
             },

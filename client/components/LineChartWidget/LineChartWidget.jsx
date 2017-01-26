@@ -36,21 +36,25 @@ class LineChartWidget extends Component {
                     'Fraction': fraction
                 })
 
-
+        //this.onScroll(1, 0)
+        
         return (
             <div className="line-chart-container" style={style}>
+                   { 
+                     // <Scroller 
+                     //    width={width} 
+                     //    height={height} 
+                     //    factor={fraction} 
+                     //    orientation="vertical"
+                     //    onScroll={this.onScroll.bind(this, records)}/>
+                    }
                 <div className="line-chart-inner">
-                    <ZoomInButton onClick={this.zoom.bind(this, -1)}/>
+                  {/*  <ZoomInButton onClick={this.zoom.bind(this, -1)}/>
                     <ZoomOutButton onClick={this.zoom.bind(this, 1)}/>
+                */ }
                    
                     <LineChartAxes groups={groups}/>
                     <LineChartGroups groups={groups}/> 
-                    <Scroller 
-                        width={width} 
-                        height={height} 
-                        factor={fraction} 
-                        orientation="horizontal"
-                        onScroll={this.onScroll.bind(this, records)}/>
                 </div>
             </div>
         )
@@ -85,3 +89,4 @@ class LineChartWidget extends Component {
 
 
 export default LineChartWidget
+

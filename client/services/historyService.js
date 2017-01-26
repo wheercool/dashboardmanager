@@ -16,7 +16,7 @@ export default function(zoom, offset, count) {
         }]
     }
     for (var i = 0; i < response.totalRecords; i++) {
-        response.groups[0].data.push([i, (i / 1000) * (i / 1000)]);
+        response.groups[0].data.push([(i / 1000) * (i / 1000), i]);
     }
     response.groups[0].data = response.groups[0].data.slice(offset, offset + count)
     return delay(1, response);

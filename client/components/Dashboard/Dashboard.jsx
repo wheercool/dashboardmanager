@@ -19,6 +19,11 @@ const widgetSize = (el) => {
     }
 }
 
+/*
+    Дашборд - контейнер для панелей виджетов
+    Ответсвенность: расположение панелей виджетов, 
+    а также инъекция необходимых виджетов в панели
+*/
 const Dashboard = React.createClass({    
     render() {
         const groups = [{
@@ -78,9 +83,8 @@ const Dashboard = React.createClass({
                             onPanelRemove={onPanelRemove}>
                                 {panelContent(d.i)}
                         </WidgetPanel>))
-                 }
-               
-             </Layout>
+                 }               
+            </Layout>
         )
     },
     onResizeStop(layout, oldItem, newItem, p, e, element) {        

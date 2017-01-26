@@ -6,9 +6,14 @@ import AvailableWidgets from '../Widgets/AvailableWidgets'
 import LineChartSetting from '../Widgets/LineChartSetting'
 import {trace} from '../../utils'
 
+/*
+ Контейнер для виджетов
+ Управляет их настройками и позволяет менять свое содержимое на
+ другой виджет
+*/
 class WidgetPanel extends Component {
     render() {
-        // debugger;
+        console.log('Rendering widget panel')
         const {id, onPanelRemove, title, isEditing} = this.props;
         const onRemove = onPanelRemove.bind(null, id);
         const dynamicTitle = isEditing? <AvailableWidgets className="pull-left"/>: title;

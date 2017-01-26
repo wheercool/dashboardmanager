@@ -5,7 +5,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 
-import Index from 'components/Index/Index';
+// import Index from 'components/Index/Index';
 import DashboardManager from 'components/DashboardManager/DashboardManager';
 
 import '../node_modules/react-grid-layout/css/styles.css';

@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
 import Dashboard from '../Dashboard/Dashboard'
 import {trace, log, copy, copyList} from '../../utils'
-
+/*
+  Компонент для создавния дашбордов
+  Ответсвенность - редактирование (создание) дашборда. Умеет:
+    добавлять новые виджеты, 
+    производить настройку виджетов, 
+    а также их расположение.
+*/
 class DashboardManager extends Component {
   constructor(props) {
     super(props);
-    
+
     var layout = [
           {i: "panel-0", x: 0, y: 0, w: 6, h: 12},
           {i: "panel-1", x: 7, y: 0, w: 6, h: 12},
@@ -15,7 +21,9 @@ class DashboardManager extends Component {
       panels: {},
       editing: false,
       oldPanels: {},
+      //id to create new layout panel
       lastId: layout.length,
+      //структура layout описывающая расположение, размеры панелей с виджетами
       layout: layout,
       oldLayout: copyList(layout)
     };
@@ -62,8 +70,8 @@ class DashboardManager extends Component {
       })
    }
 
+
   onRemove(id) {
-    debugger;
 
     this.setState({
       layout: this.state.layout.filter(d => d.i != id)
