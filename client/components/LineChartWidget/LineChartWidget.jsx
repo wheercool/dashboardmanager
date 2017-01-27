@@ -29,12 +29,7 @@ class LineChartWidget extends Component {
                 recordsAtZoom = totalRecords / (Math.pow(2, this.state.zoom)),
                 records = Math.min(recordsAtZoom, width),
                 fraction = recordsAtZoom / records;
-                log({
-                    'Zoom': this.state.zoom,
-                    'Records at zoom: ': recordsAtZoom,
-                    'Records': records,
-                    'Fraction': fraction
-                })
+              
 
         //this.onScroll(1, 0)
         

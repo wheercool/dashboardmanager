@@ -56,10 +56,8 @@ class LineChart extends Component {
         }, channel);
 
         const  makeSeries = R.pipe(R.map(addPlotter), indexBySeries);       
-        // console.log({"test": makeSeries(channels)})
+        
         const getLabels = R.pipe(R.map(R.prop('name')), R.values, R.insert(0, 'Time'));
-
-        // console.log({"lineChartProperties":  series})
 
         this.state.chart = new Dygraph(element, this.props.data, {
                 labels: getLabels(channels),

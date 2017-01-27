@@ -58,7 +58,7 @@ const Dashboard = React.createClass({
         }]
         const panelContent = (id) => {
             if (!this.props.panels[id]) return null;
-            log(this.props.panels[id].width)
+            
             // return this.state.panels[id]? `${this.state.panels[id].width}x${this.state.panels[id].height}`: id;
             return (<LineChartWidget width={this.props.panels[id].width} height={this.props.panels[id].height} groups={groups} /> )
         }

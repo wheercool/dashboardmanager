@@ -14,7 +14,7 @@ class LineChartAxes  extends Component {
         )
     }
     renderGroupAxes(group, id) {
-        console.log(group)
+        
         return (<div className="group-axes" key={id}>
                 {group.channels.map(this.renderAxis.bind(this))}
             </div>)

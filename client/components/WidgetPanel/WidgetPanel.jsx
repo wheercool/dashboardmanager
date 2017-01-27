@@ -12,8 +12,7 @@ import {trace} from '../../utils'
  другой виджет
 */
 class WidgetPanel extends Component {
-    render() {
-        console.log('Rendering widget panel')
+    render() {        
         const {id, onPanelRemove, title, isEditing} = this.props;
         const onRemove = onPanelRemove.bind(null, id);
         const dynamicTitle = isEditing? <AvailableWidgets className="pull-left"/>: title;

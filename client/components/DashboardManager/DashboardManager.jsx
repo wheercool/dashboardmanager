@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
+import {connect} from 'react-redux'
 import Dashboard from '../Dashboard/Dashboard'
 import {trace, log, copy, copyList} from '../../utils'
+import {addLayoutItem, enterEditMode, cancelEditMode,
+        replaceBackupLayout, replaceLayout,
+        removeLayoutItem} from '../../actions/dashboard'
+
+
 /*
   Компонент для создавния дашбордов
   Ответсвенность - редактирование (создание) дашборда. Умеет:
@@ -11,30 +17,23 @@ import {trace, log, copy, copyList} from '../../utils'
 class DashboardManager extends Component {
   constructor(props) {
     super(props);
-
-    var layout = [
-          {i: "panel-0", x: 0, y: 0, w: 6, h: 12},
-          {i: "panel-1", x: 7, y: 0, w: 6, h: 12},
-          {i: "panel-2", x: 0, y: 1, w: 12, h: 12}
-        ];
     this.state = {
       panels: {},
-      editing: false,
-      oldPanels: {},
-      //id to create new layout panel
-      lastId: layout.length,
-      //структура layout описывающая расположение, размеры панелей с виджетами
-      layout: layout,
-      oldLayout: copyList(layout)
+      oldPanels: {},      
     };
   }
   render() {  
+    const {isEditingMode,
+          layout, editingLayout,
+          onPannelAdd, onPanelRemove,
+          onEditModeEnter, onEditModeCancel, onEditModeComplete,
+          onLayoutChanged} = this.props
 
-    const header = !this.state.editing? (<button onClick={this.onEdit.bind(this)}>Edit</button>  ): (
-        <div>
-          <button onClick={this.onAdd.bind(this)}>Add</button>
-          <button onClick={this.onSave.bind(this)}>OK</button>
-          <button onClick={this.onCancel.bind(this)}>Cancel</button>
+    const header = !isEditingMode? (<button onClick={onEditModeEnter}>Edit</button>  ): (
+        <div>          
+          <button onClick={onPannelAdd}>Add</button>
+          <button onClick={onEditModeComplete}>OK</button>
+          <button onClick={onEditModeCancel}>Cancel</button>
         </div>);
 
     return (
@@ -44,11 +43,11 @@ class DashboardManager extends Component {
         </div>
         <div className="panel-body">
           <Dashboard 
-              layout={this.state.layout} 
-              panels={this.state.panels}
-              isEditing={this.state.editing} 
-              onLayoutChanged={this.onLayoutChanged.bind(this)}
-              onPanelRemove={this.onRemove.bind(this)}              
+              layout={layout}
+              panels={this.state.panels} //нужно для того чтобы задавать размеры содержимому панелей
+              isEditing={isEditingMode} 
+              onLayoutChanged={onLayoutChanged}
+              onPanelRemove={onPanelRemove}              
               onPanelSizeChanged={this.onPanelSizeChanged.bind(this)}
               onPanelsSizeInit={this.onPanelsSizeInit.bind(this)}/>
         </div>
@@ -69,52 +68,61 @@ class DashboardManager extends Component {
           oldPanels: copy(panels)
       })
    }
+}
 
 
-  onRemove(id) {
+DashboardManager.propTypes = {
+  layout: React.PropTypes.arrayOf(React.PropTypes.shape({ //объект описывающий layout
+    i: React.PropTypes.string, //id панели
+    x: React.PropTypes.number, //номер колонки (0 - 12)
+    y: React.PropTypes.number, //номер строки 
+    w: React.PropTypes.number, //ширина в колонках
+    h: React.PropTypes.number //высота в колонках
+  })),
+  isEditingMode: React.PropTypes.bool, //включен ли режим редактирования
 
-    this.setState({
-      layout: this.state.layout.filter(d => d.i != id)
-    })
-  }
+  onPannelAdd: React.PropTypes.func, //добавление новой панели
+  onPanelRemove: React.PropTypes.func, //добавление новой панели
+  onEditModeEnter: React.PropTypes.func, //переход в режим редактирования layout
+  onEditModeCancel: React.PropTypes.func, //отмена режима редактирования layout
+  onEditModeComplete: React.PropTypes.func, //сохранения результатов редактирования layout
+}
 
-  onLayoutChanged(newLayout) {           
-      this.setState({
-        layout: newLayout        
-      })
-  }
-
-  onAdd() {
-    this.state.layout.push({i: "panel-" + (this.state.lastId++).toString(), x: 0, y: 6, w: 12, h:12 })
-    this.setState({
-      layout: this.state.layout
-    })
-  }
-
-  onEdit() {
-    this.setState({
-      oldLayout: copyList(this.state.layout),
-      oldPanels: copy(this.state.panels),
-      editing: true
-    })
-  }
-
-  onSave() {    
-    this.setState({      
-      editing: false
-    })
-  }
-  onCancel() {    
-    this.setState({
-      editing: false,
-      layout: this.state.oldLayout,
-      panels: this.state.oldPanels
-    })
+const mapStateToProps = (state) => {
+  return {
+    layout: state.layout,    
+    isEditingMode: state.isEditingMode 
   }
 }
 
-// MainPanel.defaultProps = {
-//   items: []
-// };
-
-export default DashboardManager;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    onPannelAdd: function() {      
+      dispatch(addLayoutItem());
+    },
+    onPanelRemove: function(id) {
+      dispatch(removeLayoutItem(id))
+    },
+    onEditModeEnter: function() {      
+      dispatch((dispatch, getState) => {
+        const state = getState();
+        dispatch(enterEditMode());
+        dispatch(replaceBackupLayout(state.layout))       
+      })      
+    },
+    onEditModeCancel: function() {
+      dispatch((dispatch, getState) => {
+        const state = getState();        
+        dispatch(replaceLayout(state.backupLayout))
+        dispatch(cancelEditMode());        
+      })       
+    },
+    onEditModeComplete: function() {
+      dispatch(cancelEditMode())
+    },
+    onLayoutChanged: function(newLayout) {
+      dispatch(replaceLayout(newLayout))
+    }
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardManager);
