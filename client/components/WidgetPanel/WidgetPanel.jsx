@@ -13,17 +13,18 @@ import {trace} from '../../utils'
 */
 class WidgetPanel extends Component {
     render() {        
-        const {id, onPanelRemove, title, isEditing} = this.props;
+        const {id, onPanelRemove, title, isEditing, key} = this.props;
         const onRemove = onPanelRemove.bind(null, id);
         const dynamicTitle = isEditing? <AvailableWidgets className="pull-left"/>: title;
         const button = isEditing? <CloseButton onClick={onRemove} />: <SettingButton className="pull-right"/>;
         return (
-            <div {...this.props} className={`${this.props.className} panel-default`}>
+            <div {...this.props} className={`${this.props.className} panel-default widget-panel`}>
                
                     <div className="panel-heading clearfix-container">{dynamicTitle}{button}<div className="clearfix"/></div>
                     <div className="panel-body">
                         {
                             isEditing? (
+
                                     <LineChartSetting />
                                 )
                             :this.props.children

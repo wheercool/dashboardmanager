@@ -66,7 +66,7 @@ const Dashboard = React.createClass({
         const {isEditing, layout, onPanelRemove} = this.props;
         return (
              <Layout className="layout" 
-                layout={layout}
+                 layout={layout}
                  isDraggable={isEditing} 
                  isResizable={isEditing} 
 
@@ -74,15 +74,16 @@ const Dashboard = React.createClass({
                  onResizeStop={this.onResizeStop}              
                  onLayoutChange={this.props.onLayoutChanged}>
                  {
-                    this.props.layout.map(d => 
-                        (<WidgetPanel 
-                            id={d.i} 
-                            title="History Data" key={d.i} 
+                    this.props.layout.map(d => (<div key={d.i}>
+                        <WidgetPanel 
+                            id={d.i}
+                            title="History Data" 
                             className="panel" 
                             isEditing={isEditing}
                             onPanelRemove={onPanelRemove}>
-                                {panelContent(d.i)}
-                        </WidgetPanel>))
+                                
+                        </WidgetPanel>
+                        </div>))
                  }               
             </Layout>
         )

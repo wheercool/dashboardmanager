@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-const availableWidgets = ['History Data', 'Some stupid widget', 'Speedometer']
+const availableWidgets = ['History Data', 'Size meter', 'Speedometer']
 
 class AvailableWidgets extends Component {
     constructor(props) {

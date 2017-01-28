@@ -22,7 +22,7 @@ class Groups extends Component {
     }
 
     renderGroupItem(group, idx) {
-        return (<li role="presentation" className={!idx?"active": ""}><a href="#">{group.name}</a></li>)
+        return (<li role="presentation" key={idx} className={!idx?"active": ""}><a href="#">{group.name}</a></li>)
     }
 }
 
