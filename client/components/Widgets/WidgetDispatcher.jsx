@@ -1,20 +1,25 @@
 import React, { Component } from 'react'
+import R from 'ramda'
 
 import DefaultWidget from './DefaultWidget'
 import SizeMeter from './SizeMeter'
 /*
-	Мультикомпонент. Позволяет создавать зарегистрированные виджеты по их имени и id.
-	Также обеспечивает корректную обработку их action. 
+	Мультикомпонент. Позволяет создавать зарегистрированные виджеты по их имени и id
 */
 
 
-const registeredWidgets = {
-	"Size meter": SizeMeter
+const registeredWidgetsMapping = {
+	"Size meter": SizeMeter,
+	"Empty": DefaultWidget
 }
-class WidgetDispatcher extends Component {
+
+export const registeredWidgets = R.keys(registeredWidgetsMapping)
+
+
+export default class WidgetDispatcher extends Component {
 	render() {
 		const {widgetName, widgetId, width, height, isEditing} = this.props;
-		const Widget = registeredWidgets[widgetName] || DefaultWidget
+		const Widget = registeredWidgetsMapping[widgetName] || DefaultWidget
 		return <Widget 	width={width}
 					 	height={height}
 					 	isEditing={isEditing}
@@ -25,6 +30,7 @@ class WidgetDispatcher extends Component {
 WidgetDispatcher.propTypes = {
 	 widgetName: React.PropTypes.string.isRequired,
 	 widgetId: React.PropTypes.string.isRequired
-}
+};
 
-export default WidgetDispatcher
+ // WidgetDispatcher;
+// export registeredWidgets;

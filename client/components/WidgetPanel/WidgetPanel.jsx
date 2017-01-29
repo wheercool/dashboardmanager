@@ -8,7 +8,7 @@ import CloseButton from '../Buttons/CloseButton'
 import SettingButton from '../Buttons/SettingButton'
 import AvailableWidgets from '../Widgets/AvailableWidgets'
 import LineChartSetting from '../Widgets/LineChartSetting'
-import WidgetDispatcher from '../Widgets/WidgetDispatcher'
+import WidgetDispatcher, {registeredWidgets} from '../Widgets/WidgetDispatcher'
 /*
  Контейнер для виджетов
  Управляет их настройками и позволяет менять свое содержимое на
@@ -18,7 +18,12 @@ class WidgetPanel extends Component {
     render() {        
         const {id, onPanelRemove, title, isEditing, className, style, widgetName} = this.props;
         const onRemove = onPanelRemove.bind(null, id);
-        const dynamicTitle = isEditing? <AvailableWidgets className="pull-left"/>: title;
+        const onSelectedWidgetChanged = () => {};
+
+        const dynamicTitle = isEditing? <AvailableWidgets   className="pull-left" 
+                                                            widgets={registeredWidgets}
+                                                            selectedWidget={widgetName}
+                                                            onWidgetSelect={onSelectedWidgetChanged}/>: title;
         const button = isEditing? <CloseButton onClick={onRemove} />: <SettingButton className="pull-right"/>;
         return (
             <div {...this.props} className={`${this.props.className} panel-default widget-panel`}>
