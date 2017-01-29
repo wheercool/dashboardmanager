@@ -74,16 +74,17 @@ const Dashboard = React.createClass({
                  onResizeStop={this.onResizeStop}              
                  onLayoutChange={this.props.onLayoutChanged}>
                  {
-                    this.props.layout.map(d => (<div key={d.i}>
+                    this.props.layout.map(d => //(<div key={d.i}>
                         <WidgetPanel 
                             id={d.i}
+                            key={d.i}
+                            widgetName="Size meter"
                             title="History Data" 
                             className="panel" 
                             isEditing={isEditing}
-                            onPanelRemove={onPanelRemove}>
-                                
-                        </WidgetPanel>
-                        </div>))
+                            onPanelRemove={onPanelRemove}>  
+                        </WidgetPanel>)
+                        // </div>))
                  }               
             </Layout>
         )
