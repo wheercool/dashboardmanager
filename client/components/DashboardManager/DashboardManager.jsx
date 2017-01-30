@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux'
 import Dashboard from '../Dashboard/Dashboard'
 import {trace, log, copy, copyList} from '../../utils'
-import {addLayoutItem, enterEditMode, cancelEditMode,
-        replaceBackupLayout, replaceLayout,
-        removeLayoutItem} from '../../actions/dashboard'
+import {addLayoutItem, replaceBackupLayout, replaceLayout, removeLayoutItem} from '../../actions/layout'
+import {enterEditMode, cancelEditMode} from '../../actions/editMode'
 
 
 /*

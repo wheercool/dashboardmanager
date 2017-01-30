@@ -10,8 +10,6 @@ import thunkMiddleware from 'redux-thunk';
 import createLogger from 'redux-logger'
 
 import {createStore, applyMiddleware} from 'redux';
-import {enterEditMode, 
-        addLayoutItem, removeLayoutItem} from 'actions/dashboard'
 
 import {dashboardReducer} from 'reducers/dashboard'
 
