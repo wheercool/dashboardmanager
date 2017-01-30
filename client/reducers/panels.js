@@ -2,6 +2,7 @@ import R from 'ramda'
 import {copyObject} from './common'
 import {ADD_LAYOUT_ITEM, REMOVE_LAYOUT_ITEM, REPLACE_LAYOUT, REPLACE_PANELS, REPLACE_BACKUP_PANELS} from '../actions/panels'
 import {CHANGE_WIDGET} from '../actions/widget'
+import {widgetDispatcher} from './widgets'
 
 const panels = {
 	'panel-0': {
@@ -12,6 +13,10 @@ const panels = {
 }
 
 export const panelReducer = function(state = panels, action) {
+
+	const updateWidgetState = (id) => R.assocPath([id, 'widget', 'state'], 
+									widgetDispatcher(state[id].widget.name)(state[id].widget.state, action))
+
 	switch (action.type) {
 		case ADD_LAYOUT_ITEM:
 			return R.assoc(action.id,
@@ -32,19 +37,24 @@ export const panelReducer = function(state = panels, action) {
 
 		case REPLACE_LAYOUT:
 			
-			var result = R.mapObjIndexed((value, key) => {
+			const updateLayout = R.mapObjIndexed((value, key) => {
 				return R.assoc('layout', R.find(item => item.i == key, 
 										action.newLayout), value)
-			}, state)			
-			return result;
+			})			
+			return updateLayout(state);
 
 		case REPLACE_PANELS:
 			return action.newPanels
 
 		case CHANGE_WIDGET:
-			return R.assocPath([action.id, 'widget', 'name'], action.name, state)			
-
-		default: return state;
+			const updateWidgetName = R.assocPath([action.id, 'widget', 'name'], action.name);
+			const updateWidget = R.pipe(	updateWidgetName, updateWidgetState(action.id))			
+			return updateWidget(state);
+		default: 
+			const updateWidgetStates =R.mapObjIndexed((value, key) => {				
+				return updateWidgetState(key)(state)[key]
+			});
+			return updateWidgetStates(state)
 	}
 }
 
