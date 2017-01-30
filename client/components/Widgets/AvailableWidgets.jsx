@@ -15,7 +15,7 @@ class AvailableWidgets extends Component {
             <div {...this.props}>
                 <div className="dropdown">
                   <button onClick={this.changeMenu.bind(this, !this.state.opened)} className="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    {selectedWidget} <span className="caret"></span>
+                    {selectedWidget || 'Empty'} <span className="caret"></span>
                   </button>
                   <ul className={"dropdown-menu " + openState}>
                     {
@@ -49,7 +49,7 @@ AvailableWidgets.propTypes = {
 }
 
 AvailableWidgets.defaultProps = {
-    selectedWidget: '',
+    selectedWidget: 'Empty',
     widgets: [],
     onWidgetSelect: R.identity
 }

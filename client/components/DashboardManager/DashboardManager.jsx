@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux'
+import R from 'ramda'
 import Dashboard from '../Dashboard/Dashboard'
 import {trace, log, copy, copyList} from '../../utils'
-import {addLayoutItem, replaceBackupLayout, replaceLayout, removeLayoutItem} from '../../actions/layout'
+import {addLayoutItem, replaceBackupPanels, replaceLayout, 
+        removeLayoutItem, replacePanels} from '../../actions/panels'
 import {enterEditMode, cancelEditMode} from '../../actions/editMode'
 
 
@@ -21,13 +23,13 @@ class DashboardManager extends Component {
       oldPanels: {},      
     };
   }
-  render() {  
-    const {isEditingMode,
-          layout, editingLayout,
+  render() { 
+
+    const {isEditingMode, widgets,
+          layout,
           onPannelAdd, onPanelRemove,
           onEditModeEnter, onEditModeCancel, onEditModeComplete,
           onLayoutChanged} = this.props
-
     const header = !isEditingMode? (<button onClick={onEditModeEnter}>Edit</button>  ): (
         <div>          
           <button onClick={onPannelAdd}>Add</button>
@@ -43,6 +45,7 @@ class DashboardManager extends Component {
         <div className="panel-body">
           <Dashboard 
               layout={layout}
+              widgets={widgets}
               panels={this.state.panels} //нужно для того чтобы задавать размеры содержимому панелей
               isEditing={isEditingMode} 
               onLayoutChanged={onLayoutChanged}
@@ -87,9 +90,12 @@ DashboardManager.propTypes = {
   onEditModeComplete: React.PropTypes.func, //сохранения результатов редактирования layout
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state) => {         
+  const getLayout = R.pipe(R.values, R.map(d => d.layout)),
+        getWidgets = R.pipe(R.values, R.map(d => d.widget));  
   return {
-    layout: state.layout,    
+    layout: getLayout(state.panels),
+    widgets: getWidgets(state.panels),
     isEditingMode: state.isEditingMode 
   }
 }
@@ -106,13 +112,13 @@ const mapDispatchToProps = (dispatch) => {
       dispatch((dispatch, getState) => {
         const state = getState();
         dispatch(enterEditMode());
-        dispatch(replaceBackupLayout(state.layout))       
+        dispatch(replaceBackupPanels(state.panels))       
       })      
     },
     onEditModeCancel: function() {
       dispatch((dispatch, getState) => {
         const state = getState();        
-        dispatch(replaceLayout(state.backupLayout))
+        dispatch(replacePanels(state.backupPanels))
         dispatch(cancelEditMode());        
       })       
     },

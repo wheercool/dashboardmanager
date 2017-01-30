@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import {connect} from 'react-redux'
 
 import ReactGridLayout, {WidthProvider} from 'react-grid-layout';
 import {trace, log, elementSize} from '../../utils'
 import LineChartWidget from '../LineChartWidget/LineChartWidget'
 import WidgetPanel from '../WidgetPanel/WidgetPanel'
-
+import {changeWidget} from '../../actions/widget'
 const Layout = WidthProvider(ReactGridLayout);
 
 const widgetSize = (el) => {
@@ -63,41 +64,34 @@ const Dashboard = React.createClass({
             return (<LineChartWidget width={this.props.panels[id].width} height={this.props.panels[id].height} groups={groups} /> )
         }
 
-        const {isEditing, layout, onPanelRemove} = this.props;
+        const {isEditing, layout, widgets,
+                onPanelRemove, onWidgetChange} = this.props;
         return (
              <Layout className="layout" 
                  layout={layout}
                  isDraggable={isEditing} 
                  isResizable={isEditing} 
 
-                 cols={12} rowHeight={30} width={1200}
-                 onResizeStop={this.onResizeStop}              
+                 cols={12} rowHeight={30} width={1200}                
                  onLayoutChange={this.props.onLayoutChanged}>
                  {
-                    this.props.layout.map(d => //(<div key={d.i}>
+                    widgets.map(widget => //(<div key={d.i}>
                         <WidgetPanel 
-                            id={d.i}
-                            key={d.i}
-                            widgetName="Size meter"
-                            title="History Data" 
-                            className="panel" 
+                            id={widget.id}
+                            key={widget.id}
+                            widgetName={widget.name}
+                            title={widget.name} 
+                            className="panel"
                             isEditing={isEditing}
-                            onPanelRemove={onPanelRemove}>  
+                            onPanelRemove={onPanelRemove}
+                            onWidgetChange={onWidgetChange.bind(null, widget.id)}>  
                         </WidgetPanel>)
                         // </div>))
                  }               
             </Layout>
         )
     },
-    onResizeStop(layout, oldItem, newItem, p, e, element) {        
-        let panel = element.parentElement,           
-            id = newItem.i,
 
-            placeholderElement = document.querySelector('.react-grid-placeholder');
-
-            this.props.onPanelSizeChanged(id, widgetSize(placeholderElement))            
-        
-    },
     componentDidMount() {
         //We should wait the end of transition animation to get correct width 
         setTimeout(() => {       
@@ -116,5 +110,10 @@ const Dashboard = React.createClass({
 
     }  
 })
-
-export default Dashboard;
+const mapStateToProps = (state) => ({})
+const mapDispatchToProps = (dispatch) => ({
+    onWidgetChange: (id, name) => {
+        dispatch(changeWidget(id, name))
+    }
+})
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);

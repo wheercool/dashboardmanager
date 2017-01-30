@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import R from 'ramda'
 import {trace} from '../../utils'
+import {connect} from 'react-redux'
 
 import '../../styles/widget-panel.css'
 
@@ -16,14 +17,14 @@ import WidgetDispatcher, {registeredWidgets} from '../Widgets/WidgetDispatcher'
 */
 class WidgetPanel extends Component {
     render() {        
-        const {id, onPanelRemove, title, isEditing, className, style, widgetName} = this.props;
+        const {id, onPanelRemove, title, isEditing, className, style, widgetName, onWidgetChange} = this.props;
         const onRemove = onPanelRemove.bind(null, id);
         const onSelectedWidgetChanged = () => {};
 
         const dynamicTitle = isEditing? <AvailableWidgets   className="pull-left" 
                                                             widgets={registeredWidgets}
                                                             selectedWidget={widgetName}
-                                                            onWidgetSelect={onSelectedWidgetChanged}/>: title;
+                                                            onWidgetSelect={onWidgetChange}/>: title;
         const button = isEditing? <CloseButton onClick={onRemove} />: <SettingButton className="pull-right"/>;
         return (
             <div {...this.props} className={`${this.props.className} panel-default widget-panel`}>
@@ -48,6 +49,10 @@ WidgetPanel.propTypes = {
     widgetName: React.PropTypes.string.isRequired, //название виджета
     isEditing: React.PropTypes.bool, //находится ли в режиме настройки виджет
     id: React.PropTypes.string, //уникальный идентификатор виджета
+
+}
+
+const mapStateToProps = {
 
 }
 export default WidgetPanel

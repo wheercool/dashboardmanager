@@ -18,6 +18,7 @@ export const registeredWidgets = R.keys(registeredWidgetsMapping)
 
 export default class WidgetDispatcher extends Component {
 	render() {
+		
 		const {widgetName, widgetId, width, height, isEditing} = this.props;
 		const Widget = registeredWidgetsMapping[widgetName] || DefaultWidget
 		return <Widget 	width={width}

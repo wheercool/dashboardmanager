@@ -5,9 +5,8 @@ import simpleGrid from './simpleGrid'
 
 import {editMode} from './editMode'
 
-import {layoutReducer, backupLayoutReducer} from './layout'
+import {panelReducer, backupPanelReducer} from './panels'
 
-const copyArray = R.map(R.identity);
 
 const initialState = {
 	layout: null, // расположение виджетов на панели. Активен когда isEditingMode = false
@@ -29,8 +28,8 @@ function makeScopedReducer(reducerFunction, reducerName) {
 
 const scopes = {
 	isEditingMode: editMode, 
-	layout: layoutReducer,
-	backupLayout: backupLayoutReducer
+	panels: panelReducer,
+	backupPanels: backupPanelReducer
 }
 
 export const dashboardReducer = combineReducers(scopes)
