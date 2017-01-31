@@ -8,7 +8,7 @@ import '../../styles/widget-panel.css'
 import CloseButton from '../Buttons/CloseButton'
 import SettingButton from '../Buttons/SettingButton'
 import AvailableWidgets from '../Widgets/AvailableWidgets'
-import LineChartSetting from '../Widgets/LineChartSetting'
+
 import WidgetDispatcher, {registeredWidgets} from '../Widgets/WidgetDispatcher'
 /*
  Контейнер для виджетов
@@ -16,19 +16,19 @@ import WidgetDispatcher, {registeredWidgets} from '../Widgets/WidgetDispatcher'
  другой виджет
 */
 class WidgetPanel extends Component {
-    render() {        
+    render() {
         const {id, onPanelRemove, title, isEditing, className, style, widgetName, onWidgetChange} = this.props;
         const onRemove = onPanelRemove.bind(null, id);
         const onSelectedWidgetChanged = () => {};
 
-        const dynamicTitle = isEditing? <AvailableWidgets   className="pull-left" 
+        const dynamicTitle = isEditing? <AvailableWidgets   className="pull-left"
                                                             widgets={registeredWidgets}
                                                             selectedWidget={widgetName}
                                                             onWidgetSelect={onWidgetChange}/>: title;
         const button = isEditing? <CloseButton onClick={onRemove} />: <SettingButton className="pull-right"/>;
         return (
             <div {...this.props} className={`${this.props.className} panel-default widget-panel`}>
-               
+
                     <div className="panel-heading clearfix-container">{dynamicTitle}{button}<div className="clearfix"/></div>
                     <div className="panel-body">
                         <WidgetDispatcher widgetName={widgetName}
@@ -38,7 +38,7 @@ class WidgetPanel extends Component {
                                           isEditing={isEditing}/>
                         {this.props.children}
                     </div>
-             
+
             </div>
         )
     }

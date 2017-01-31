@@ -50,7 +50,7 @@ export const panelReducer = function(state = panels, action) {
 		case REPLACE_PANELS:
 			return action.newPanels
 
-		case CHANGE_WIDGET:
+		case CHANGE_WIDGET:			
 			const updateWidgetName = R.assocPath([action.id, 'widget', 'name'], action.name);
 			const updateWidget = R.pipe(updateWidgetName, updateWidgetState(action.id))
 			return updateWidget(state);

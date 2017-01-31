@@ -9,14 +9,14 @@ class LineChartGroups extends Component {
         let groupsCount = groups.length;
         return (
             <div className="line-chart-group">
-                {groups.map(this.renderGroupChart)}                
+                {groups.map(this.renderGroupChart)}
             </div>
         )
     }
     renderGroupChart(group, id) {
         var data = group.data || [[0, 1], [1, 3]]
         return (<LineChart key={id} data={data} channels={group.channels}/>)
-    }    
+    }
 }
 
 export default LineChartGroups;

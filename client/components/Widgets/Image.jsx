@@ -4,16 +4,32 @@ import R from 'ramda'
 import {changeImageUrl} from '../../actions/image'
 import {widgetAction} from '../../actions/common'
 
-const ImageSettings = ({url, onUrlChange}) =>
-  (<div>
-      <label>Url:</label>
-      <input type="text" value={url} onChange={onUrlChange}/>
-  </div>)
+const ImageSettings = ({id, url, onUrlChange}) =>
+  (<div className="contnainer">
+      <div className="col-sm-6">
+        <img src={url} />
+      </div>
+      <div className="col-sm-6">
+        <div className="form-group">
+
+          <label  htmlFor={id + 'url-editor'}>Url:</label>
+          <input  type="text"
+                  className="form-control"
+                  id={id + 'url-editor'}
+                  value={url}
+                  onChange={onUrlChange}
+                  placeholder="http://..."
+                  />
+          </div>
+      </div>
+
+
+</div>)
 
 const Image = ({urlFn, width, height, isEditing, id, onUrlChange}) =>
 {
   const url = urlFn(id)
-  return isEditing? <ImageSettings url={url} onUrlChange={onUrlChange(id)}/>
+  return isEditing? <ImageSettings url={url} id={id} onUrlChange={onUrlChange(id)}/>
           : <img src={url} width={width} height={height}/>
 }
 

@@ -3,7 +3,7 @@ let panelIdGenerator = 1;
 export const ADD_LAYOUT_ITEM  = 'ADD_LAYOUT_ITEM'
 
 export const addLayoutItem = function(item) {
-	const {x = 0, y = 0, w = 12, h = 12} = item || {};
+	const {x = 0, y = 0, w = 2, h = 6} = item || {};
 	return {
 		type: ADD_LAYOUT_ITEM,
 		id: 'panel-' + panelIdGenerator++,
@@ -15,7 +15,7 @@ export const REMOVE_LAYOUT_ITEM = 'REMOVE_LAYOUT_ITEM'
 export const removeLayoutItem = function(id) {
 	return {
 		type: REMOVE_LAYOUT_ITEM,
-		id		
+		id
 	}
 }
 
@@ -33,7 +33,7 @@ export const REPLACE_LAYOUT = 'REPLACE_LAYOUT'
 export const replaceLayout = function(newLayout) {
 	return {
 		type: REPLACE_LAYOUT,
-		newLayout		
+		newLayout
 	}
 }
 

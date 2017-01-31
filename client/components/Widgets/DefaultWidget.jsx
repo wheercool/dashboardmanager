@@ -1,3 +1,3 @@
 import React, { Component } from 'react'
 
-export default (props) => <div>DefaultWidget</div>
+export default (props) => <div></div>
