@@ -3,6 +3,7 @@ import R from 'ramda'
 
 import DefaultWidget from './DefaultWidget'
 import SizeMeter from './SizeMeter'
+import Image from './Image'
 /*
 	Мультикомпонент. Позволяет создавать зарегистрированные виджеты по их имени и id
 */
@@ -10,7 +11,8 @@ import SizeMeter from './SizeMeter'
 
 const registeredWidgetsMapping = {
 	"Size meter": SizeMeter,
-	"Empty": DefaultWidget
+	"Empty": DefaultWidget,
+	"Image": Image
 }
 
 export const registeredWidgets = R.keys(registeredWidgetsMapping)
@@ -18,7 +20,7 @@ export const registeredWidgets = R.keys(registeredWidgetsMapping)
 
 export default class WidgetDispatcher extends Component {
 	render() {
-		
+
 		const {widgetName, widgetId, width, height, isEditing} = this.props;
 		const Widget = registeredWidgetsMapping[widgetName] || DefaultWidget
 		return <Widget 	width={width}

@@ -9,3 +9,7 @@ export function simpleAction(type) {
 		return {type}
 	}
 }
+
+export function widgetAction(id, action) {
+	return R.assoc('scope', id, action)
+}
