@@ -4,6 +4,8 @@ import R from 'ramda'
 import DefaultWidget from './DefaultWidget'
 import SizeMeter from './SizeMeter'
 import Image from './Image'
+import LineChart from './LineChart'
+
 /*
 	Мультикомпонент. Позволяет создавать зарегистрированные виджеты по их имени и id
 */
@@ -12,7 +14,8 @@ import Image from './Image'
 const registeredWidgetsMapping = {
 	"Size meter": SizeMeter,
 	"Empty": DefaultWidget,
-	"Image": Image
+	"Image": Image,
+	"Line Chart": LineChart
 }
 
 export const registeredWidgets = R.keys(registeredWidgetsMapping)

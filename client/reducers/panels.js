@@ -13,13 +13,17 @@ const panels = {
 }
 
 export const panelReducer = function(state = panels, action) {
-	const getWidgetReducer = (id) => widgetReducerDispatcher(state[id].widget.name);
-	const getWidgetInstanceReducer = (id) =>  makeScopedReducer(getWidgetReducer(id), id);
-	const getWidgetState = (id) => state[id].widget.state;
-	const getWidgetNewState = (id) => getWidgetInstanceReducer(id)(getWidgetState(id), action);
-	const updateWidgetState = (id) => R.assocPath([id, 'widget', 'state'],
-																				getWidgetNewState(id));
-
+	const getWidgetReducer = widgetReducerDispatcher;
+	const getPanelWidgetName = (id) => state[id].widget.name;
+	const getPanelWidgetReducer = R.pipe(getPanelWidgetName, getWidgetReducer);
+	const getWidgetInstanceReducer = (name, id) => makeScopedReducer(getWidgetReducer(name), id);
+	const getPanelWidgetInstanceReducer = (id) =>  makeScopedReducer(getPanelWidgetReducer(id), id);
+	const getPanelWidgetState = (id) => state[id].widget.state;
+	const getPanelWidgetNewState = (id) => getPanelWidgetInstanceReducer(id)(getPanelWidgetState(id), action);
+	const updatePanelWidgetState = (id) => R.assocPath([id, 'widget', 'state'],
+																				getPanelWidgetNewState(id));
+  const getWidgetDefaultState = (name, id) => getWidgetInstanceReducer(name, id)(undefined, {scope: id})
+	const updateWidgetState = (name, id) => R.assocPath([id, 'widget', 'state'], getWidgetDefaultState(name, id));
 
 	switch (action.type) {
 		case ADD_LAYOUT_ITEM:
@@ -50,15 +54,15 @@ export const panelReducer = function(state = panels, action) {
 		case REPLACE_PANELS:
 			return action.newPanels
 
-		case CHANGE_WIDGET:			
+		case CHANGE_WIDGET:
 			const updateWidgetName = R.assocPath([action.id, 'widget', 'name'], action.name);
-			const updateWidget = R.pipe(updateWidgetName, updateWidgetState(action.id))
+			const updateWidget = R.pipe(updateWidgetName, updateWidgetState(action.name, action.id))
 			return updateWidget(state);
 		default:
-			const updateWidgetStates = R.mapObjIndexed((value, key) => {
-				return updateWidgetState(key)(state)[key]
+			const updatePanelWidgetStates = R.mapObjIndexed((value, key) => {
+				return updatePanelWidgetState(key)(state)[key]
 			});
-			return updateWidgetStates(state)
+			return updatePanelWidgetStates(state)
 	}
 }
 

@@ -5,11 +5,10 @@ export const copyObject = (obj) => Object.assign(obj, {})
 /*
 Создает специализированную версию редьюсера, ограниченную доп. параметром scope
 */
-export function makeScopedReducer(reducerFunction, reducerScope) {    
+export function makeScopedReducer(reducerFunction, reducerScope) {
     return (state, action) => {
-        const {scope} = action;
         const isInitializationCall = state === undefined;
-        if(scope !== reducerScope && !isInitializationCall) return state;
+        if(!isInitializationCall && action.scope !== reducerScope) return state;
 
         return reducerFunction(state, action);
     }

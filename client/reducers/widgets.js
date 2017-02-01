@@ -11,6 +11,6 @@ const widgetReducers = {
 Возвращает редьюсер виджета по имени виджета
 */
 export function widgetReducerDispatcher(name) {
-	var reducer = widgetReducers[name] || R.identity;
+	var reducer = widgetReducers[name] || ((state, action) => undefined);	
 	return reducer;
 }
