@@ -48,5 +48,16 @@ class Scroller extends Component {
     }
 
 }
+Scroller.propTypes = {
+  factor: React.PropTypes.number, //коэфициент масштабирования
+  width: React.PropTypes.number,
+  height: React.PropTypes.number,
+  orientation: React.PropTypes.oneOf(['horizontal', 'vertical']),
+  onScroll: React.PropTypes.func,
+}
 
+Scroller.defaultProps = {
+  orientation: 'horizontal',
+  onScroll: () => {}  
+}
 export default Scroller;
