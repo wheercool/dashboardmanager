@@ -24,14 +24,16 @@ class Scroller extends Component {
     }
 
     componentDidMount() {
-        window.addEventListener('scroll', this.handleScroll.bind(this), true);
+        this.handleScroll = this._handleScroll.bind(this);
+        // this.handleScroll = $.throttle(300, this._handleScroll.bind(this));
+        window.addEventListener('scroll', this.handleScroll, true);
     }
 
     componentWillUnmount() {
-        window.removeEventListener('scroll', this.handleScroll.bind(this), true);
+        window.removeEventListener('scroll', this.handleScroll, true);
     }
 
-    handleScroll(e) {
+    _handleScroll(e) {
         let target = e.srcElement;
         if (ReactDOM.findDOMNode(this) == target) {
             let innerOffset = $(target.children[0]).offset(),
@@ -58,6 +60,6 @@ Scroller.propTypes = {
 
 Scroller.defaultProps = {
   orientation: 'horizontal',
-  onScroll: () => {}  
+  onScroll: () => {}
 }
 export default Scroller;

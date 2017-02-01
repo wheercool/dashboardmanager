@@ -10,16 +10,16 @@ export default function(zoom, offset, count) {
                 minValue: 0,
                 maxValue: 0.3,
                 measure: 'C',
-                color: 'red'                
+                color: 'red'
             }],
             data: []
         }]
     }
     for (var i = 0; i < response.totalRecords; i++) {
-        response.groups[0].data.push([(i / 1000) * (i / 1000), i]);
+        response.groups[0].data.push([(i / 1000) * (i / 1000), i, i, i]);
     }
     response.groups[0].data = response.groups[0].data.slice(offset, offset + count)
-    return delay(1, response);
-    // return fetch(url); 
+    return delay(100, response);
+    // return fetch(url);
 
 }
