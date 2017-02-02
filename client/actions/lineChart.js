@@ -18,3 +18,19 @@ export function fetchLineChartDataFail(error) {
     error
   }
 }
+
+export const CHANGE_ZOOM = 'CHANGE_ZOOM'
+export const changeZoom = (zoom, offset) => {
+  return {
+    type: CHANGE_ZOOM,
+    zoom, offset
+  }
+}
+
+export const CHANGE_OFFSET = 'CHANGE_OFFSET'
+export const changeOffset = (offset) => {
+  return {
+    type: CHANGE_OFFSET,
+    offset
+  }
+}

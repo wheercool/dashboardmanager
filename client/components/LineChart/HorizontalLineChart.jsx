@@ -15,7 +15,7 @@ class HorizontalLineChart extends Component {
     }
     render() {
 
-      const {data, width, height} = this.props;
+      const {data, width, height, min, max} = this.props;
       const getY = R.last
       const getYSeries = R.map(getY)
       const getYData = getYSeries//R.pipe(R.map(getXSeries), R.flatten)
@@ -28,6 +28,7 @@ class HorizontalLineChart extends Component {
             this.state.chart.resize(width, height);
             this.state.chart.updateOptions({
                   'file':  data,
+                  dateWindow: [min, max]
                   //'valueRange': extentX(data)
                 })
         }
@@ -38,7 +39,7 @@ class HorizontalLineChart extends Component {
     }
     componentDidMount() {
         let element = ReactDOM.findDOMNode(this);
-        const {data, width, height, labels, ranges, colors} = this.props;
+        const {data, width, height, labels, ranges, colors, min, max} = this.props;
 
         const indexBySeries = R.indexBy(R.prop('name'));
 
@@ -62,7 +63,7 @@ class HorizontalLineChart extends Component {
                 labels: labels,
                 width: width,
                 height: height,
-                // dateWindow: [0, 3], //x-axis range
+                dateWindow: [min, max], //x-axis range
                 axes: {
                         y: {
                             drawAxis: false, //y шкала будт отображать не корректные данные

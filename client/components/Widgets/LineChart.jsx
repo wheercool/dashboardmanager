@@ -6,23 +6,42 @@ import HorizontalLineChart from '../LineChart/HorizontalLineChart'
 import Scroller from '../LineChart/Scroller'
 import historyService from '../../services/historyService'
 import {widgetAction} from '../../actions/common'
+import {changeZoom, changeOffset} from '../../actions/lineChart'
 
 import {fetchLineChartData, fetchLineChartDataSuccess} from '../../actions/lineChart'
+import ZoomInButton from '../Buttons/ZoomInButton'
+import ZoomOutButton from '../Buttons/ZoomOutButton'
 
 class LineChartWidget extends Component {
   render() {
-    const {id, instanceProperties, width, height, onScroll} = this.props;
-    const {url, chartData, totalRecords, labels, ranges, colors, orientation} = instanceProperties(id)
-    const chartWidth = width - 40;
-    const chartHeight = height - 150;
-    const factor = chartData.length? totalRecords /chartData.length
-                    : 0;
-    const onScrollHandler = onScroll(id)
+    const {id, instanceProperties, width, height, onScroll, onZoomIn, onZoomOut} = this.props;
+    const {url, chartData, totalDuration,
+          zoom, offset, offsetPercent,
+          labels, ranges, colors,
+          orientation }= instanceProperties(id)
 
+    const duration = Math.pow(2, zoom),
+          min = offset,
+          max = offset + duration,
+
+          chartWidth = width - 40,
+          chartHeight = height - 150,
+          factor = chartData.length?
+                    totalDuration / duration
+                    : 0,
+
+          onScrollHandler = onScroll(id),
+          onZoomInHandler = onZoomIn(id),
+          onZoomOutHandler = onZoomOut(id),
+          localOffset = offsetPercent * Math.max(factor * width, width)
     return (
       orientation == 'horizontal'? (
-        <div>
+      <div>
+          <ZoomInButton onClick={onZoomInHandler}/>
+          <ZoomOutButton onClick={onZoomOutHandler}/>
           <HorizontalLineChart  data={chartData}
+                                min={min}
+                                max={max}
                                 labels={labels}
                                 ranges={ranges}
                                 colors={colors}
@@ -32,6 +51,7 @@ class LineChartWidget extends Component {
           <Scroller width={width}
                     orientation="horizontal"
                     factor={factor}
+                    offset={localOffset}
                     onScroll={onScrollHandler}/>
         </div>
       )
@@ -50,20 +70,29 @@ const mapStateToProps = (state) => {
       instanceProperties: (id) => {
         const instanceState = state.panels[id].widget.state;
 
-        const {data: {values, totalRecords}, settings: {channels, url, timeBasedMainAxis, orientation}} = instanceState;
-        const makeDateColumn = (R.map(R.adjust(date, 0)))
-        const chartData = timeBasedMainAxis? makeDateColumn(values) : values;
-        // debugger;
-        const labels = R.pipe(R.map(R.prop('name')),
+        const { data: {values, totalDuration},
+                settings: {zoom,
+                          offsetPercent,
+                          channels,
+                          url,
+                          timeBasedMainAxis,
+                          orientation}
+              } = instanceState;
+        const offset = totalDuration * offsetPercent;
+        const makeDateColumn = (R.map(R.adjust(date, 0))),
+          chartData = timeBasedMainAxis? makeDateColumn(values) : values,
+
+          labels = R.pipe(R.map(R.prop('name')),
                               R.insert(0, 'Time'))
-                      (channels);
-        const pairs = R.map(channel => [channel.name, [channel.minValue, channel.maxValue]], channels);
-        const ranges = R.fromPairs(pairs);
-        const colorPairs = R.map(channel => [channel.name, channel.color], channels);
-        const colors = R.fromPairs(colorPairs)
+                      (channels),
+          pairs = R.map(channel => [channel.name, [channel.minValue, channel.maxValue]], channels),
+          ranges = R.fromPairs(pairs),
+          colorPairs = R.map(channel => [channel.name, channel.color], channels),
+          colors = R.fromPairs(colorPairs);
 
         return {
-          totalRecords,
+          totalDuration,
+          zoom, offsetPercent, offset,
           chartData: chartData.length? chartData: [R.repeat(0, labels.length)],
           url, labels, ranges, colors,
           orientation
@@ -72,16 +101,49 @@ const mapStateToProps = (state) => {
   }
 }
 
+const fetchAndRender = (dispatch, id, offset, zoom) => {
+  dispatch(fetchLineChartData());
+  historyService(zoom, offset).then((response) => {
+    dispatch(widgetAction(id, fetchLineChartDataSuccess({
+      totalDuration: response.totalDuration,
+      values: response.groups[0].data
+    })))
+  })
+}
 const mapDispatchToProps = (dispatch) => ({
-  onScroll: (id) => function(offset) {
-    dispatch((state) => {
-      dispatch(fetchLineChartData());
-      historyService(0, offset, 100).then((response) => {
-        dispatch(widgetAction(id, fetchLineChartDataSuccess({
-          totalRecords: response.totalRecords,
-          values: response.groups[0].data
-        })))
-      })
+
+  onScroll: (id) => function(offset, percent) {
+    console.log('On scroll:' + offset + '/' + percent)
+    dispatch((dispatch, getState) => {
+      const {settings, data} = getState().panels[id].widget.state;
+      dispatch(widgetAction(id, changeOffset(percent)));
+      //fetchAndRender(dispatch, id, offset, state.zoom)
+    })
+  },
+  onZoomIn : (id) => function() {
+    dispatch((dispatch, getState) => {
+      const {settings, data} = getState().panels[id].widget.state;
+      const duration = Math.pow(2, settings.zoom),
+            prevOffset = settings.offsetPercent * data.totalDuration,
+            zoom = settings.zoom - 1,
+            offset = prevOffset + 0.25 * duration,
+            offsetPercent = offset / data.totalDuration
+      dispatch(widgetAction(id, changeZoom(zoom, offsetPercent)))
+      // fetchAndRender(dispatch, id, offset, zoom)
+    })
+  },
+  onZoomOut : (id) => function() {
+    dispatch((dispatch, getState) => {
+      const {settings, data} = getState().panels[id].widget.state;
+
+      const duration = Math.pow(2, settings.zoom),
+            zoom = settings.zoom + 1,
+            prevOffset = settings.offsetPercent * data.totalDuration,
+            offset = prevOffset - 0.5 * duration,
+            offsetPercent = offset / data.totalDuration
+
+      dispatch(widgetAction(id, changeZoom(zoom, offsetPercent)))
+      // fetchAndRender(dispatch, id, offset, zoom)
     })
   }
 })

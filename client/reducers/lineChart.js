@@ -1,13 +1,17 @@
+import R from 'ramda'
 import {FETCH_LINE_CHART_DATA,
       FETCH_LINE_CHART_DATA_SUCCESS,
-      FETCH_LINE_CHART_DATA_FAIL } from '../actions/lineChart'
+      FETCH_LINE_CHART_DATA_FAIL,
+      CHANGE_ZOOM, CHANGE_OFFSET} from '../actions/lineChart'
 
 import {combineReducers} from 'redux'
 
 const initialState = {
   url: 'http://google.com', // source of data to fetch from
-  timeBasedMainAxis: true,
+  timeBasedMainAxis: false,
   orientation: 'horizontal',
+  zoom: 0,
+  offsetPercent: 0,
   channels: [{
       name: 'Pressure',
       minValue: 0,
@@ -30,8 +34,8 @@ const initialState = {
 }
 
 const initialData = {
-  totalRecords: 1000,
-  values: [[0, 0, 12, 21], [1000, 3, 16, 25], [2000, 10, 17, 30]]
+  totalDuration: 10,
+  values: [[0, 0, 12, 21], [1, 3, 16, 25], [2, 10, 17, 30], [3, 11, 14, 32], [4, 31, 22, 12]]
 };
 
 function data(state = initialData, action) {
@@ -44,6 +48,17 @@ function data(state = initialData, action) {
 }
 
 export function settings(state = initialState, action) {
+  switch (action.type) {
+    case CHANGE_OFFSET:
+        return R.assoc('offsetPercent', action.offset, state)
+
+    case CHANGE_ZOOM:
+        return R.merge(state, {
+            zoom: action.zoom,
+            offsetPercent: action.offset
+          })
+    default:return state;
+  }
   return state;
 }
 

@@ -3,7 +3,7 @@ import {delay} from '../utils'
 export default function(zoom, offset, count) {
     var url = '/ajax/' + offset + '/' + (offset + 2000);
     var response = {
-        totalRecords: 1000000,
+        totalDuration: 1000000,
         groups: [{
             channels: [{
                 name: 'Temperature',

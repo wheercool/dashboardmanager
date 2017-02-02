@@ -25,7 +25,10 @@ class WidgetPanel extends Component {
                                                             widgets={registeredWidgets}
                                                             selectedWidget={widgetName}
                                                             onWidgetSelect={onWidgetChange}/>: title;
-        const button = isEditing? <CloseButton onClick={onRemove} />: <SettingButton className="pull-right"/>;
+        const button = isEditing? <CloseButton onClick={onRemove} />: <SettingButton className="pull-right"/>,
+              panelBorder = 2,
+              innerWidth = parseInt(style.width, 10) - panelBorder,
+              innerHeight = parseInt(style.height, 10) - panelBorder;
         return (
             <div {...this.props} className={`${this.props.className} panel-default widget-panel`}>
 
@@ -33,8 +36,8 @@ class WidgetPanel extends Component {
                     <div className="panel-body">
                         <WidgetDispatcher widgetName={widgetName}
                                           widgetId={id}
-                                          width={parseInt(style.width, 10)}
-                                          height={parseInt(style.height, 10)}
+                                          width={innerWidth}
+                                          height={innerHeight}
                                           isEditing={isEditing}/>
                         {this.props.children}
                     </div>
