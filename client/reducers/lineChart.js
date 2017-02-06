@@ -11,7 +11,7 @@ const initialState = {
   timeBasedMainAxis: false,
   orientation: 'horizontal',
   zoom: 0,
-  offsetPercent: 0,
+  offsetPercent: 0.1,
   channels: [{
       name: 'Pressure',
       minValue: 0,

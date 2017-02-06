@@ -11,6 +11,8 @@ import {changeZoom, changeOffset} from '../../actions/lineChart'
 import {fetchLineChartData, fetchLineChartDataSuccess} from '../../actions/lineChart'
 import ZoomInButton from '../Buttons/ZoomInButton'
 import ZoomOutButton from '../Buttons/ZoomOutButton'
+import {offsetToPercent, getFactor, getScrollerOffset} from '../../model/lineChartModel'
+
 
 class LineChartWidget extends Component {
   render() {
@@ -21,27 +23,29 @@ class LineChartWidget extends Component {
           orientation }= instanceProperties(id)
 
     const duration = Math.pow(2, zoom),
-          min = offset,
-          max = offset + duration,
+          minValue = offset,
+          maxValue = offset + duration,
 
           chartWidth = width - 40,
           chartHeight = height - 150,
-          factor = chartData.length?
-                    totalDuration / duration
-                    : 0,
+          factor = getFactor(duration, totalDuration),
 
           onScrollHandler = onScroll(id),
           onZoomInHandler = onZoomIn(id),
           onZoomOutHandler = onZoomOut(id),
-          localOffset = offsetPercent * Math.max(factor * width, width)
+          // localOffset = offsetPercent * width * factor
+          localOffset = getScrollerOffset(offset, Math.min(0, minValue), totalDuration, width * factor)
+          console.log('offset: ' + offset)
+          console.log('localOffset : ' + localOffset)
+          console.log('offsetPercent : ' + offsetPercent)
     return (
       orientation == 'horizontal'? (
       <div>
           <ZoomInButton onClick={onZoomInHandler}/>
           <ZoomOutButton onClick={onZoomOutHandler}/>
           <HorizontalLineChart  data={chartData}
-                                min={min}
-                                max={max}
+                                min={minValue}
+                                max={maxValue}
                                 labels={labels}
                                 ranges={ranges}
                                 colors={colors}

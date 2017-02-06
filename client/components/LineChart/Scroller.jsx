@@ -33,6 +33,18 @@ class Scroller extends Component {
     componentDidMount() {
         var element = ReactDOM.findDOMNode(this)
 
+        const {offset, orientation} = this.props;
+        console.log('Did mount: ' + offset)
+
+
+        this.silence = true;
+
+        if (orientation == 'horizontal')
+          element.scrollLeft = offset;
+        else element.scrollTop = offset;
+
+        this.silence = false;
+
         this.handleScroll = this._handleScroll.bind(this);
         // this.handleScroll = $.throttle(300, this._handleScroll.bind(this));
         window.addEventListener('scroll', this.handleScroll, true);
@@ -66,6 +78,8 @@ class Scroller extends Component {
             };
             console.log(this.silence)
             if (this.props.onScroll && !this.silence) {
+              console.log('Scrolling...')
+
               if (this.props.orientation == 'horizontal') {
                 var value = offset.left,
                     max = Math.max(factor * width, width),
