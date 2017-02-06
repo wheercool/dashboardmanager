@@ -19,18 +19,24 @@ export function fetchLineChartDataFail(error) {
   }
 }
 
-export const CHANGE_ZOOM = 'CHANGE_ZOOM'
-export const changeZoom = (zoom, offset) => {
+export const ZOOM_IN_VISIBLE_INTERVAL = 'ZOOM_IN_VISIBLE_INTERVAL'
+export const zoomInVisibleInterval = () => {
   return {
-    type: CHANGE_ZOOM,
-    zoom, offset
+    type: ZOOM_IN_VISIBLE_INTERVAL
   }
 }
 
-export const CHANGE_OFFSET = 'CHANGE_OFFSET'
-export const changeOffset = (offset) => {
+export const ZOOM_OUT_VISIBLE_INTERVAL = 'ZOOM_OUT_VISIBLE_INTERVAL'
+export const zoomOutVisibleInterval = () => {
   return {
-    type: CHANGE_OFFSET,
+    type: ZOOM_OUT_VISIBLE_INTERVAL
+  }
+}
+
+export const MOVE_VISIBLE_INTERVAL = 'MOVE_VISIBLE_INTERVAL'
+export const moveVisibleInterval = (offset) => {
+  return {
+    type: MOVE_VISIBLE_INTERVAL,
     offset
   }
 }

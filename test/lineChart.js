@@ -1,5 +1,8 @@
 import {offsetToPercent, getFactor, getScrollerOffset,
-        intervalLength, moveInterval, zoomInInterval, zoomOutInterval, intervalCenter} from '../client/model/lineChartModel'
+
+        makeInterval, intervalLength, moveInterval,
+        zoomInInterval, zoomOutInterval,
+        intervalCenter, embraceIntervals, intervalPointAtPercent} from '../client/model/lineChartModel'
 import {expect} from 'chai'
 import wu, {zip} from 'wu'
 import R from 'ramda'
@@ -157,6 +160,13 @@ describe('Interval', () => {
                         .map(([minValue, length]) => ({min: minValue, max: minValue + length}))
                         .take(testCount);
 
+  describe('makeInterval', () => {
+    it('should construct interval', () => {
+      expect(makeInterval(0, 10))
+        .to.deep.equal(makeInterval(0, 10))
+    })
+
+  })
   describe('intervalLength', () => {
     it('should calculate intervalLength', () => {
       expect(intervalLength({min: 0, max: 10}))
@@ -295,5 +305,29 @@ describe('Interval', () => {
           })
 
       })
+    })
+
+    describe('embraceIntervals', () => {
+      it('should make interval with min point to be either a.min or b.min', () => {
+          zip(intervals(), intervals())
+            .forEach(([a, b]) => {
+              const embraceInterval = embraceIntervals(a, b);
+              expect(embraceInterval.min)
+                .to.be.equal(Math.min(a.min, b.min))
+            })
+      })
+
+      it('should make interval with max point to be either b.max or a.max', () => {
+        zip(intervals(), intervals())
+          .forEach(([a, b]) => {
+            const embraceInterval = embraceIntervals(a, b);
+            expect(embraceInterval.max)
+              .to.be.equal(Math.max(a.max, b.max))
+          })
+      })
+    })
+
+    describe('intervalPointAtPercent', () => {
+      
     })
 });

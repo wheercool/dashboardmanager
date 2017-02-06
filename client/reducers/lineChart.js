@@ -2,7 +2,11 @@ import R from 'ramda'
 import {FETCH_LINE_CHART_DATA,
       FETCH_LINE_CHART_DATA_SUCCESS,
       FETCH_LINE_CHART_DATA_FAIL,
-      CHANGE_ZOOM, CHANGE_OFFSET} from '../actions/lineChart'
+      ZOOM_IN_VISIBLE_INTERVAL,
+      ZOOM_OUT_VISIBLE_INTERVAL,
+      MOVE_VISIBLE_INTERVAL} from '../actions/lineChart'
+
+import {moveInterval, zoomInInterval, zoomOutInterval} from '../model/lineChartModel'
 
 import {combineReducers} from 'redux'
 
@@ -10,8 +14,10 @@ const initialState = {
   url: 'http://google.com', // source of data to fetch from
   timeBasedMainAxis: false,
   orientation: 'horizontal',
-  zoom: 0,
-  offsetPercent: 0.1,
+  visibleInterval: {
+    min: 0,
+    max: 2
+  },
   channels: [{
       name: 'Pressure',
       minValue: 0,
@@ -34,7 +40,15 @@ const initialState = {
 }
 
 const initialData = {
-  totalDuration: 10,
+  dataInterval: {
+    min: 0,
+    max: 4
+  },
+  requestedInterval: {
+    min: 0,
+    max: 4
+  },
+  minimalIntervalLenght: 1,
   values: [[0, 0, 12, 21], [1, 3, 16, 25], [2, 10, 17, 30], [3, 11, 14, 32], [4, 31, 22, 12]]
 };
 
@@ -42,21 +56,26 @@ function data(state = initialData, action) {
   switch (action.type) {
     case FETCH_LINE_CHART_DATA_SUCCESS:
       return action.data
-
     default: return state;
   }
 }
 
 export function settings(state = initialState, action) {
   switch (action.type) {
-    case CHANGE_OFFSET:
-        return R.assoc('offsetPercent', action.offset, state)
+    case MOVE_VISIBLE_INTERVAL:
+        return R.assoc('visibleInterval',
+                moveInterval(state.visibleInterval, action.offset),
+                state)
 
-    case CHANGE_ZOOM:
-        return R.merge(state, {
-            zoom: action.zoom,
-            offsetPercent: action.offset
-          })
+    case ZOOM_IN_VISIBLE_INTERVAL:
+        return R.assoc('visibleInterval',
+                  zoomInInterval(state.visibleInterval),
+                  state)
+    case ZOOM_OUT_VISIBLE_INTERVAL:
+        return R.assoc('visibleInterval',
+          zoomOutInterval(state.visibleInterval),
+          state)
+
     default:return state;
   }
   return state;

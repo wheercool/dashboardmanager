@@ -34,8 +34,6 @@ class Scroller extends Component {
         var element = ReactDOM.findDOMNode(this)
 
         const {offset, orientation} = this.props;
-        console.log('Did mount: ' + offset)
-
 
         this.silence = true;
 
@@ -56,8 +54,6 @@ class Scroller extends Component {
     componentDidUpdate() {
       const element = ReactDOM.findDOMNode(this)
       const {offset, orientation} = this.props;
-      console.log('Mounted: ' + offset)
-
 
       this.silence = true;
       if (orientation == 'horizontal')
@@ -67,27 +63,26 @@ class Scroller extends Component {
     }
     _handleScroll(e) {
         let target = e.srcElement;
-        const {factor, width} = this.props;
+        const {factor, width, offset} = this.props;
 
         if (ReactDOM.findDOMNode(this) == target) {
             let innerOffset = $(target.children[0]).offset(),
                 outerOffset = $(target).offset();
-            var offset = {
+            var offsetValue = {
                 left: outerOffset.left - innerOffset.left,
                 top: outerOffset.top - innerOffset.top
             };
-            console.log(this.silence)
             if (this.props.onScroll && !this.silence) {
-              console.log('Scrolling...')
 
               if (this.props.orientation == 'horizontal') {
-                var value = offset.left,
+                var value = offsetValue.left,
                     max = Math.max(factor * width, width),
-                    percent = value / max;
+                    percent = value / max,
+                    oldPercent = offset / max;
 
-                this.props.onScroll(offset.left, percent)
+                this.props.onScroll(offset, offsetValue.left)
               } else {
-                this.props.onScroll(offset.top, )
+                this.props.onScroll(offsetValue.top, )
               }
             }
         }
@@ -98,6 +93,7 @@ Scroller.propTypes = {
   factor: React.PropTypes.number, //коэфициент масштабирования
   width: React.PropTypes.number,
   height: React.PropTypes.number,
+  offset: React.PropTypes.number,
   orientation: React.PropTypes.oneOf(['horizontal', 'vertical']),
   onScroll: React.PropTypes.func,
 }

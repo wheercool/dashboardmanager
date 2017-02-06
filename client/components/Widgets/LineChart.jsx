@@ -6,46 +6,47 @@ import HorizontalLineChart from '../LineChart/HorizontalLineChart'
 import Scroller from '../LineChart/Scroller'
 import historyService from '../../services/historyService'
 import {widgetAction} from '../../actions/common'
-import {changeZoom, changeOffset} from '../../actions/lineChart'
+import {zoomInVisibleInterval, zoomOutVisibleInterval, moveVisibleInterval} from '../../actions/lineChart'
 
 import {fetchLineChartData, fetchLineChartDataSuccess} from '../../actions/lineChart'
 import ZoomInButton from '../Buttons/ZoomInButton'
 import ZoomOutButton from '../Buttons/ZoomOutButton'
-import {offsetToPercent, getFactor, getScrollerOffset} from '../../model/lineChartModel'
+import {offsetToPercent, getFactor, getScrollerOffset, embraceIntervals, intervalLength} from '../../model/lineChartModel'
 
 
 class LineChartWidget extends Component {
   render() {
     const {id, instanceProperties, width, height, onScroll, onZoomIn, onZoomOut} = this.props;
-    const {url, chartData, totalDuration,
-          zoom, offset, offsetPercent,
+    const {url, chartData, dataInterval,
+          visibleInterval,
           labels, ranges, colors,
-          orientation }= instanceProperties(id)
+          orientation } = instanceProperties(id)
 
-    const duration = Math.pow(2, zoom),
-          minValue = offset,
-          maxValue = offset + duration,
-
-          chartWidth = width - 40,
+    const chartWidth = width - 40,
           chartHeight = height - 150,
-          factor = getFactor(duration, totalDuration),
+          totalInterval = embraceIntervals(visibleInterval, dataInterval),
+          visibleTotalScale = getFactor(intervalLength(visibleInterval),
+                      intervalLength(totalInterval)),
+          scrollVisibleScale = getFactor(width, intervalLength(visibleInterval)),
 
-          onScrollHandler = onScroll(id),
+          onScrollHandler = onScroll(id, scrollVisibleScale),
           onZoomInHandler = onZoomIn(id),
           onZoomOutHandler = onZoomOut(id),
-          // localOffset = offsetPercent * width * factor
-          localOffset = getScrollerOffset(offset, Math.min(0, minValue), totalDuration, width * factor)
-          console.log('offset: ' + offset)
-          console.log('localOffset : ' + localOffset)
-          console.log('offsetPercent : ' + offsetPercent)
+          offset = visibleInterval.min - totalInterval.min,
+          scrollOffset = offset / scrollVisibleScale;
+          // localOffset =  //visibleInterval.min * width * factor
+          // localOffset = getScrollerOffset(visibleInterval.min - totalInterval.min,
+          //         visibleInterval.min,
+          //         visibleInterval.max,
+          //         width * factor)
     return (
       orientation == 'horizontal'? (
       <div>
           <ZoomInButton onClick={onZoomInHandler}/>
           <ZoomOutButton onClick={onZoomOutHandler}/>
           <HorizontalLineChart  data={chartData}
-                                min={minValue}
-                                max={maxValue}
+                                min={visibleInterval.min}
+                                max={visibleInterval.max}
                                 labels={labels}
                                 ranges={ranges}
                                 colors={colors}
@@ -54,8 +55,8 @@ class LineChartWidget extends Component {
 
           <Scroller width={width}
                     orientation="horizontal"
-                    factor={factor}
-                    offset={localOffset}
+                    factor={visibleTotalScale}
+                    offset={scrollOffset}
                     onScroll={onScrollHandler}/>
         </div>
       )
@@ -74,15 +75,14 @@ const mapStateToProps = (state) => {
       instanceProperties: (id) => {
         const instanceState = state.panels[id].widget.state;
 
-        const { data: {values, totalDuration},
-                settings: {zoom,
-                          offsetPercent,
+        const { data: {values, dataInterval, minimalIntervalLenght, requrestedInterval},
+                settings: {
+                          visibleInterval,
                           channels,
                           url,
                           timeBasedMainAxis,
                           orientation}
               } = instanceState;
-        const offset = totalDuration * offsetPercent;
         const makeDateColumn = (R.map(R.adjust(date, 0))),
           chartData = timeBasedMainAxis? makeDateColumn(values) : values,
 
@@ -95,8 +95,9 @@ const mapStateToProps = (state) => {
           colors = R.fromPairs(colorPairs);
 
         return {
-          totalDuration,
-          zoom, offsetPercent, offset,
+          dataInterval,
+          visibleInterval,
+          minimalIntervalLenght,
           chartData: chartData.length? chartData: [R.repeat(0, labels.length)],
           url, labels, ranges, colors,
           orientation
@@ -116,37 +117,23 @@ const fetchAndRender = (dispatch, id, offset, zoom) => {
 }
 const mapDispatchToProps = (dispatch) => ({
 
-  onScroll: (id) => function(offset, percent) {
-    console.log('On scroll:' + offset + '/' + percent)
+  onScroll: (id, scale) => function(oldOffset, newOffset) {
     dispatch((dispatch, getState) => {
       const {settings, data} = getState().panels[id].widget.state;
-      dispatch(widgetAction(id, changeOffset(percent)));
+      const offset = (newOffset - oldOffset) * scale;
+      dispatch(widgetAction(id, moveVisibleInterval(offset)));
       //fetchAndRender(dispatch, id, offset, state.zoom)
     })
   },
   onZoomIn : (id) => function() {
     dispatch((dispatch, getState) => {
-      const {settings, data} = getState().panels[id].widget.state;
-      const duration = Math.pow(2, settings.zoom),
-            prevOffset = settings.offsetPercent * data.totalDuration,
-            zoom = settings.zoom - 1,
-            offset = prevOffset + 0.25 * duration,
-            offsetPercent = offset / data.totalDuration
-      dispatch(widgetAction(id, changeZoom(zoom, offsetPercent)))
+      dispatch(widgetAction(id, zoomInVisibleInterval()))
       // fetchAndRender(dispatch, id, offset, zoom)
     })
   },
   onZoomOut : (id) => function() {
     dispatch((dispatch, getState) => {
-      const {settings, data} = getState().panels[id].widget.state;
-
-      const duration = Math.pow(2, settings.zoom),
-            zoom = settings.zoom + 1,
-            prevOffset = settings.offsetPercent * data.totalDuration,
-            offset = prevOffset - 0.5 * duration,
-            offsetPercent = offset / data.totalDuration
-
-      dispatch(widgetAction(id, changeZoom(zoom, offsetPercent)))
+      dispatch(widgetAction(id, zoomOutVisibleInterval()))
       // fetchAndRender(dispatch, id, offset, zoom)
     })
   }
