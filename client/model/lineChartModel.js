@@ -67,10 +67,17 @@ export function zoomInInterval(interval) {
 }
 //Увеличение размера видимого интервала с учетом сохранения центра
 export function zoomOutInterval(interval) {
-  return interval;
+  return {
+    min: interval.min - 0.5 * intervalLength(interval),
+    max: interval.max + 0.5 * intervalLength(interval)
+  };
 }
 
 //Создает видимый интервал с заданным уровнем зума
 export function makeDefaultVisibleInterval(minimalIntervalLenght, dataInterval, zoom) {
 
+}
+
+export function intervalCenter(interval) {
+  return interval.min + 0.5 * (interval.max - interval.min);
 }

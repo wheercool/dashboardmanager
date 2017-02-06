@@ -1,8 +1,8 @@
 import {offsetToPercent, getFactor, getScrollerOffset,
-        intervalLength, moveInterval, zoomInInterval, zoomOutInterval} from '../client/model/lineChartModel'
+        intervalLength, moveInterval, zoomInInterval, zoomOutInterval, intervalCenter} from '../client/model/lineChartModel'
 import {expect} from 'chai'
 import wu, {zip} from 'wu'
-
+import R from 'ramda'
 function* rnd() {
   while (true) {
     yield Math.random()
@@ -51,7 +51,7 @@ describe('lineChart model', () => {
         .forEach(([n, totalDuration]) =>
             expect(offsetToPercent(totalDuration * n, totalDuration),
                 `n = ${n} totalDuration = ${totalDuration}`)
-            .to.within(n - eps, n + eps))
+            .to.be.closeTo(n,eps))
     })
 
 
@@ -85,7 +85,7 @@ describe('lineChart model', () => {
         .take(testCount)
         .forEach(([n, value]) =>
           expect(getFactor(value, value * n), `n = ${n} value = ${value}`)
-          .within(n - eps, n + eps)
+          .to.be.closeTo(n,eps)
       )
     })
 
@@ -128,7 +128,7 @@ describe('lineChart model', () => {
         .filter(([value, minValue, width]) => minValue != 0 && width != 0)
         .take(testCount)
         .forEach(([value, minValue, width]) => expectGetScrollerOffset(value, minValue, value, width)
-          .to.be.within(width - eps, width + eps))
+          .to.be.closeTo(width, eps))
     })
 
     it('should return width/n if value = minValue + 1/n * (maxValue - minValue)', () => {
@@ -140,7 +140,7 @@ describe('lineChart model', () => {
         .forEach(([n, minValue, maxValue, width]) =>
             expect(getScrollerOffset(minValue + 1 / n * (maxValue - minValue), minValue, maxValue, width),
           `n = ${n} minValue = ${minValue} maxValue = ${maxValue} width = ${width}`)
-              .to.be.within(width / n - eps, width / n + eps))
+              .to.be.closeTo(width / n, eps))
     })
 
   });
@@ -151,30 +151,57 @@ describe('lineChart model', () => {
 
 
 describe('Interval', () => {
-      it('should calculate intervalLength', () => {
-        expect(intervalLength({min: 0, max: 10}))
-          .to.be.equal(10);
-        expect(intervalLength({min: -10, max: 0}))
-          .to.be.equal(10);
-        expect(intervalLength({min: -10, max: 10}))
-          .to.be.equal(20);
-      })
+    const intervals = () => wu(
+                              zip(rnd(), rnd())
+                            )
+                        .map(([minValue, length]) => ({min: minValue, max: minValue + length}))
+                        .take(testCount);
 
-
-    it('moveInterval shoud move interval', () => {
-      expect(moveInterval({min: 0, max: 10}, 10))
-        .to.deep.equal({
-          min: 10,
-          max: 20
-        });
-
-      expect(moveInterval({min: 10, max: 20}, -10))
-        .to.deep.equal({
-          min: 0,
-          max: 10
-        });
+  describe('intervalLength', () => {
+    it('should calculate intervalLength', () => {
+      expect(intervalLength({min: 0, max: 10}))
+        .to.be.equal(10);
+      expect(intervalLength({min: -10, max: 0}))
+        .to.be.equal(10);
+      expect(intervalLength({min: -10, max: 10}))
+        .to.be.equal(20);
     })
 
+    it('should calculate 0 length', () => {
+      wu(rnd())
+        .take(testCount)
+        .forEach(min => {
+          expect(intervalLength({min, max: min}))
+            .to.be.equal(0)
+        })
+    })
+  });
+
+    describe('moveInterval', () => {
+      it('should fit points', () => {
+        expect(moveInterval({min: 0, max: 10}, 10))
+          .to.deep.equal({
+            min: 10,
+            max: 20
+          });
+
+        expect(moveInterval({min: 10, max: 20}, -10))
+          .to.deep.equal({
+            min: 0,
+            max: 10
+          });
+      })
+
+      it('should keep lenght of interval', () => {
+        zip(intervals(), rnd())
+          .forEach(([interval, offset]) => {
+            expect(intervalLength(
+                      moveInterval(interval, offset)
+                    ))
+              .to.be.closeTo(intervalLength(interval),eps)
+          })
+      })
+    })
 
     describe('zoomInInterval', () => {
       it('should fit exact points', () => {
@@ -191,16 +218,82 @@ describe('Interval', () => {
           })
       })
 
-      it('should decrease length of interval to 0.5 of base', () => {
-        wu(zip(rnd(), rnd()))
-          .map(([min, length]) => ({min: min, max: min + length}))
-          .take(testCount)
+      it('should decrease length of interval in 0.5 times', () => {
+          intervals()
           .forEach(interval =>
               expect(intervalLength(zoomInInterval(interval)))
-                .to.be.within(0.5 * intervalLength(interval) - eps,
-                    0.5 * intervalLength(interval) + eps)
+                .to.be.closeTo(0.5 * intervalLength(interval), eps)
           )
+      })
+
+      it('should keep interval center', () => {
+        intervals()
+          .forEach(interval => {
+            expect(R.pipe(zoomInInterval, intervalCenter)(interval))
+              .to.be.closeTo(intervalCenter(interval), eps)
+          })
       })
     })
 
+    describe('zoomOutInterval', () => {
+      it('should fit points', () => {
+        expect(zoomOutInterval({min:-1, max: 1}))
+          .to.deep.equal({
+            min: -2,
+            max: 2
+        })
+
+        expect(zoomOutInterval({min: -2, max: 2}))
+          .to.deep.equal({
+            min: -4,
+            max: 4
+          })
+      })
+
+      it('should increase lenght in 2 times', () => {
+        intervals()
+            .forEach(interval => {
+            expect(intervalLength(zoomOutInterval(interval)))
+              .to.be.closeTo(2 * intervalLength(interval),eps)
+          })
+      })
+
+      it('should keep interval center', () => {
+        intervals()
+          .forEach(interval => {
+            expect(R.pipe(zoomOutInterval, intervalCenter)(interval))
+              .to.be.closeTo(intervalCenter(interval), eps)
+          })
+      })
+    })
+
+    describe('intervalCenter', () => {
+      it('should fit points', () => {
+        expect(intervalCenter({min: -10, max: 10}))
+          .to.be.equal(0)
+
+        expect(intervalCenter({min: 0, max: 20}))
+          .to.be.equal(10)
+      })
+    })
+    describe('zoomInInterval/zoomOutInterval', () => {
+      it('should keep lenght after zoomIn then zoomOut', () => {
+        intervals()
+          .forEach(interval => {
+            expect(R.pipe(zoomInInterval, zoomOutInterval, intervalLength)(interval))
+              .to.be.closeTo(intervalLength(interval), eps)
+          })
+
+      })
+
+
+      it('should keep lenght after zoomOut then zoomIn', () => {
+        intervals()
+          .forEach(interval => {
+            expect(R.pipe(zoomOutInterval, zoomInInterval, intervalLength)(interval))
+              .to.be.closeTo(intervalLength(interval),eps)
+          })
+
+      })
+    })
 });
