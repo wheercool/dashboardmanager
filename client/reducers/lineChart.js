@@ -6,7 +6,7 @@ import {FETCH_LINE_CHART_DATA,
       ZOOM_OUT_VISIBLE_INTERVAL,
       MOVE_VISIBLE_INTERVAL} from '../actions/lineChart'
 
-import {moveInterval, zoomInInterval, zoomOutInterval} from '../model/lineChartModel'
+import {moveInterval, zoomInInterval, zoomOutInterval} from '../model/interval'
 
 import {combineReducers} from 'redux'
 
@@ -15,25 +15,25 @@ const initialState = {
   timeBasedMainAxis: false,
   orientation: 'horizontal',
   visibleInterval: {
-    min: 0,
+    min: 1,
     max: 2
   },
   channels: [{
       name: 'Pressure',
       minValue: 0,
-      maxValue: 1000000,
+      maxValue: 10000,
       color: 'red',
       measure: 'Pa'
   }, {
       name: 'M',
-      minValue: 10,
-      maxValue: 20,
+      minValue: 0,
+      maxValue: 1000,
       color: 'green',
       measure: 'Pa'
   }, {
       name: 'Temperature',
-      minValue: 20,
-      maxValue: 30,
+      minValue: 0,
+      maxValue: 1000,
       color: 'brown',
       measure: 'C'
   }]

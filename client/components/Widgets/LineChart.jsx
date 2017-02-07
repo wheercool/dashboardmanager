@@ -11,7 +11,9 @@ import {zoomInVisibleInterval, zoomOutVisibleInterval, moveVisibleInterval} from
 import {fetchLineChartData, fetchLineChartDataSuccess} from '../../actions/lineChart'
 import ZoomInButton from '../Buttons/ZoomInButton'
 import ZoomOutButton from '../Buttons/ZoomOutButton'
-import {offsetToPercent, getFactor, getScrollerOffset, embraceIntervals, intervalLength} from '../../model/lineChartModel'
+import {offsetToPercent, getFactor, getScrollerOffset} from '../../model/lineChartModel'
+import {embraceIntervals, intervalLength,
+      zoomInInterval, zoomOutInterval, moveInterval} from '../../model/interval'
 
 
 class LineChartWidget extends Component {
@@ -106,12 +108,14 @@ const mapStateToProps = (state) => {
   }
 }
 
-const fetchAndRender = (dispatch, id, offset, zoom) => {
+const fetchAndRender = (dispatch, id, url, requrestedInterval, channels, zoom) => {
   dispatch(fetchLineChartData());
-  historyService(zoom, offset).then((response) => {
+  historyService(url, requrestedInterval, channels, zoom).then((response) => {
     dispatch(widgetAction(id, fetchLineChartDataSuccess({
-      totalDuration: response.totalDuration,
-      values: response.groups[0].data
+      requrestedInterval: requrestedInterval,
+      dataInterval: response.dataInterval,
+      channels: channels,
+      values: response.values
     })))
   })
 }
@@ -119,22 +123,28 @@ const mapDispatchToProps = (dispatch) => ({
 
   onScroll: (id, scale) => function(oldOffset, newOffset) {
     dispatch((dispatch, getState) => {
-      const {settings, data} = getState().panels[id].widget.state;
+      const {settings: {channels, visibleInterval, url}, data} = getState().panels[id].widget.state;
       const offset = (newOffset - oldOffset) * scale;
+      const requestedInterval = moveInterval(visibleInterval, offset)
       dispatch(widgetAction(id, moveVisibleInterval(offset)));
-      //fetchAndRender(dispatch, id, offset, state.zoom)
+
+      fetchAndRender(dispatch, id, url, requestedInterval, channels, 0)
     })
   },
   onZoomIn : (id) => function() {
     dispatch((dispatch, getState) => {
       dispatch(widgetAction(id, zoomInVisibleInterval()))
-      // fetchAndRender(dispatch, id, offset, zoom)
+      const {settings: {channels, visibleInterval, url}, data} = getState().panels[id].widget.state;
+      const requestedInterval = zoomInInterval(visibleInterval)
+      fetchAndRender(dispatch, id, url, requestedInterval, channels, 0)
     })
   },
   onZoomOut : (id) => function() {
     dispatch((dispatch, getState) => {
       dispatch(widgetAction(id, zoomOutVisibleInterval()))
-      // fetchAndRender(dispatch, id, offset, zoom)
+      const {settings: {channels, visibleInterval, url}, data} = getState().panels[id].widget.state;
+      const requestedInterval = zoomOutInterval(visibleInterval)
+      fetchAndRender(dispatch, id, url, requestedInterval, channels, 0)
     })
   }
 })

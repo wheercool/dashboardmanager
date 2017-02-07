@@ -1,24 +1,43 @@
 import {delay} from '../utils'
 
-export default function(zoom, offset, count) {
-    var url = '/ajax/' + offset + '/' + (offset + 2000);
+const dataInterval = {min: 0, max: 1000}
+const channelsData = {
+  // "Temperature": [],
+  // "Pressure": []
+};
+const data = []
+for (var i = dataInterval.min; i < dataInterval.max / 3; i++) {
+  const time = i,
+        temperature = i,
+        pressure = i + 2,
+        torque = i * 2;
+  data.push([time, temperature, pressure, torque])
+}
+
+for (var i = dataInterval.max / 3; i < dataInterval.max / 2; i++) {
+  const time = i,
+        temperature = dataInterval.max /3 - i,
+        pressure = temperature + 2,
+        torque = temperature * 2;
+  data.push([time, temperature, pressure, torque])
+}
+
+for (var i = dataInterval.max / 2; i < dataInterval.max; i++) {
+  const time = i,
+        temperature = i,
+        pressure = temperature + 2,
+        torque = temperature * 2;
+  data.push([time, temperature, pressure, torque])
+}
+
+export default function(url, requrestedInterval, channels, zoom) {
+    // var url = '/ajax/' + offset + '/' + (offset + 2000);
     var response = {
-        totalDuration: 1000000,
-        groups: [{
-            channels: [{
-                name: 'Temperature',
-                minValue: 0,
-                maxValue: 0.3,
-                measure: 'C',
-                color: 'red'
-            }],
-            data: []
-        }]
+        requrestedInterval,
+        dataInterval,
+        channels,
+        values: data.filter(d => d[0] >= requrestedInterval.min && d[0] <= requrestedInterval.max)
     }
-    for (var i = 0; i < response.totalRecords; i++) {
-        response.groups[0].data.push([(i / 1000) * (i / 1000), i, i, i]);
-    }
-    response.groups[0].data = response.groups[0].data.slice(offset, offset + count)
     return delay(100, response);
     // return fetch(url);
 
