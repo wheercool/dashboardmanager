@@ -43,6 +43,9 @@ export function belongsInterval(interval, value) {
   return value >= interval.min && value <= interval.max
 }
 
+export function insideInterval(interval, value) {
+  return value > interval.min && value < interval.max;
+}
 export function intervalPointAtPercent(interval, percent) {
   return makeInterval(interval.min, interval.max)
 }

@@ -1,4 +1,4 @@
-import {belongsInterval} from './interval'
+import {belongsInterval, insideInterval} from './interval'
 import R from 'ramda'
 /*
 Point - точка, либо разрыв
@@ -32,18 +32,33 @@ export function makeGapBetween(x1, x2) {
   их было достаточно отобразить interval в виде графике
 */
 export function representingInterval(interval, points) {
-  const expectedXs = [4, 5, 6, 7, 8, 9, 10, 11],
-        exptectedPoints =  expectedXs.map( x => makePoint(x, 10));
-  return exptectedPoints
-}
+  const left = closestLeft(interval.min, points),
+        right = closestRight(interval.max, points),
+        inside = pointsInside(interval, points);
 
+        if (right == null) {
+          return (left != null)
+              ? R.prepend(left, inside)
+              : inside;
+        }
+  return R.pipe(R.prepend(left), R.append(right))(inside)
+}
 
 /*
 Возвращает список точек находящихся внутри интервала
 */
+export function pointsInside(interval, points) {
+  return R.filter(point => insideInterval(interval, point.x), points)
+}
+
+
+/*
+Возвращает список точек принадлежащих интервалу
+*/
 export function pointsBelongs(interval, points) {
   return R.filter(point => belongsInterval(interval, point.x), points)
 }
+
 
 /*
 Возвращает точку ближайшую слева от точки x
@@ -73,8 +88,16 @@ export function closestRight(x, points) {
 }
 
 /*
-
+Объединяет множество точек таким образом, что
+множество X является объединением их множеств, для
+отсутвующих значений вставляется emptyValue
 */
-export function mergeSeries() {
-
+export function mergePoints(emptyValue, a, b) {
+  const getX = point => point.x,
+        xs = R.union(a.map(getX), b.map(getX)),
+        findY = x => R.compose(
+                          (point => point.y),
+                          R.defaultTo({y: emptyValue}),
+                          R.find(R.propEq('x', x)));
+  return xs.map(x => [x, findY(x)(a), findY(x)(b)])
 }

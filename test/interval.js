@@ -1,6 +1,7 @@
 import {
     makeInterval, intervalLength,
     moveInterval, belongsInterval,
+    insideInterval,
     zoomInInterval, zoomOutInterval,
     intervalCenter, embraceIntervals,
     intervalPointAtPercent} from '../client/model/interval'
@@ -217,7 +218,38 @@ describe('Interval', () => {
           })
       })
     })
-    describe('intervalPointAtPercent', () => {
 
+    describe('insideInterval', () => {
+      it('should fit points', () => {
+        const interval = makeInterval(0, 10)
+        expect(insideInterval(interval, 4))
+          .to.be.true
+      })
+
+
+      it('should return false for min of interval', () => {
+        intervals()
+          .forEach(interval => {
+            expect(insideInterval(interval, interval.min))
+              .to.be.false
+          })
+      })
+
+      it('should return false for max of interval', () => {
+        intervals()
+          .forEach(interval => {
+            expect(insideInterval(interval, interval.max))
+              .to.be.false
+          })
+      })
+
+      it('should return true for center of interval', () => {
+        intervals()
+          .forEach(interval => {
+            expect(insideInterval(interval, intervalCenter(interval)))
+              .to.be.true
+          })
+      })
     })
+
 });
