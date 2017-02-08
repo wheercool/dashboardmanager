@@ -36,11 +36,18 @@ export function representingInterval(interval, points) {
         right = closestRight(interval.max, points),
         inside = pointsInside(interval, points);
 
-        if (right == null) {
-          return (left != null)
-              ? R.prepend(left, inside)
-              : inside;
-        }
+  if (right == null) {
+    return (left != null)
+        ? R.prepend(left, inside)
+        : inside;
+  }
+
+  if (left == null) {
+    return (right != null)
+      ? R.append(right, inside)
+      : inside;
+  }
+
   return R.pipe(R.prepend(left), R.append(right))(inside)
 }
 

@@ -1,42 +1,46 @@
 import {delay} from '../utils'
+import {representingInterval, makePoint, mergePoints} from '../model/channelModel'
 
 const dataInterval = {min: 0, max: 1000}
 const channelsData = {
   // "Temperature": [],
   // "Pressure": []
 };
-const data = []
+
+var temperature = [],
+    pressure = [],
+    torque = [];
+
 for (var i = dataInterval.min; i < dataInterval.max / 3; i++) {
-  const time = i,
-        temperature = i,
-        pressure = i + 2,
-        torque = i * 2;
-  data.push([time, temperature, pressure, torque])
+  temperature.push(makePoint(i, i))
+  pressure.push(makePoint(i, i + 2))
+  torque.push(makePoint(i, i * 2))
 }
 
 for (var i = dataInterval.max / 3; i < dataInterval.max / 2; i++) {
-  const time = i,
-        temperature = dataInterval.max /3 - i,
-        pressure = temperature + 2,
-        torque = temperature * 2;
-  data.push([time, temperature, pressure, torque])
+  temperature.push(makePoint(i, dataInterval.max /3 - i,))
+  pressure.push(makePoint(i, dataInterval.max /3 - i + 2))
+  torque.push(makePoint(i, (dataInterval.max /3 - i) * 2))
 }
 
 for (var i = dataInterval.max / 2; i < dataInterval.max; i++) {
-  const time = i,
-        temperature = i,
-        pressure = temperature + 2,
-        torque = temperature * 2;
-  data.push([time, temperature, pressure, torque])
+  temperature.push(makePoint(i, i))
+  pressure.push(makePoint(i, i + 2))
+  torque.push(makePoint(i, i * 2))
 }
 
 export default function(url, requrestedInterval, channels, zoom) {
     // var url = '/ajax/' + offset + '/' + (offset + 2000);
+    var mergedPoints = mergePoints(null,
+                  representingInterval(requrestedInterval, torque),
+                  representingInterval(requrestedInterval, pressure)
+               );
+
     var response = {
         requrestedInterval,
         dataInterval,
         channels,
-        values: data.filter(d => d[0] >= requrestedInterval.min && d[0] <= requrestedInterval.max)
+        values: mergedPoints
     }
     return delay(100, response);
     // return fetch(url);

@@ -134,7 +134,67 @@ describe('Channel Model', () => {
           expect(actual)
             .to.deep.equal(expected)
         })
+
+        it('should manage case when closestLeft point is null', () => {
+          const xs =   [2, 6, 10, 14],
+                points = xs.map( x => makePoint(x, 10)),
+                interval = makeInterval(1, 11),
+                expected = points,
+                actual = representingInterval(interval, points);
+          expect(closestLeft(interval.min, points))
+            .to.be.equal(null)
+
+          expect(actual)
+            .to.deep.equal(expected)
+
+        })
+
+
+
+          it('should manage case when closestRight point is null', () => {
+            const xs =   [2, 6, 10, 14],
+                  points = xs.map( x => makePoint(x, 10)),
+                  interval = makeInterval(3, 15),
+                  expected = points,
+                  actual = representingInterval(interval, points);
+            expect(closestRight(interval.max, points))
+              .to.be.equal(null)
+
+            expect(actual)
+              .to.deep.equal(expected)
+
+          })
+
+          it('should manage case when both closestRight and closestLeft are null', () => {
+            const xs =   [2, 6, 10, 14],
+                  points = xs.map( x => makePoint(x, 10)),
+                  interval = makeInterval(1, 15),
+                  expected = points,
+                  actual = representingInterval(interval, points);
+
+            expect(closestLeft(interval.min, points))
+              .to.be.equal(null)
+
+            expect(closestRight(interval.max, points))
+              .to.be.equal(null)
+
+            expect(actual)
+              .to.deep.equal(expected)
+
+          })
+
+        it('should manage case when points contain only one point', () => {
+          const points = [makePoint(1, 10)],
+                interval = makeInterval(0, 20),
+                expected = [makePoint(1, 10)],
+                actual = representingInterval(interval, points);
+
+                expect(actual)
+                  .to.deep.equal(expected)
+        })
+
       })
+
 
       describe('CASE: gap inside interval', () => {
 

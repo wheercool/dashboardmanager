@@ -24,13 +24,15 @@ const initialState = {
       maxValue: 10000,
       color: 'red',
       measure: 'Pa'
-  }, {
-      name: 'M',
-      minValue: 0,
-      maxValue: 1000,
-      color: 'green',
-      measure: 'Pa'
-  }, {
+  },
+  // {
+  //     name: 'M',
+  //     minValue: 0,
+  //     maxValue: 1000,
+  //     color: 'green',
+  //     measure: 'Pa'
+  // },
+  {
       name: 'Temperature',
       minValue: 0,
       maxValue: 1000,
@@ -44,12 +46,12 @@ const initialData = {
     min: 0,
     max: 4
   },
-  requestedInterval: {
-    min: 0,
-    max: 4
-  },
+  // requestedInterval: {
+  //   min: 0,
+  //   max: 4
+  // },
   minimalIntervalLenght: 1,
-  values: [[0, 0, 12, 21], [1, 3, 16, 25], [2, 10, 17, 30], [3, 11, 14, 32], [4, 31, 22, 12]]
+  values: []//[0, 0, 12, 21], [1, 3, 16, 25], [2, 10, 17, 30], [3, 11, 14, 32], [4, 31, 22, 12]]
 };
 
 function data(state = initialData, action) {
