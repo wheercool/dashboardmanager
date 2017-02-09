@@ -42,7 +42,7 @@ export default function(url, requrestedInterval, channels, zoom) {
         channels,
         values: mergedPoints
     }
-    return delay(100, response);
+    return delay(300, response);
     // return fetch(url);
 
 }

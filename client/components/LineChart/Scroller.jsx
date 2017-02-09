@@ -43,8 +43,9 @@ class Scroller extends Component {
 
         this.silence = false;
 
-        this.handleScroll = this._handleScroll.bind(this);
-        // this.handleScroll = $.throttle(300, this._handleScroll.bind(this));
+        // this.handleScroll = this._handleScroll.bind(this);
+        this.handleScroll = $.throttle(100, this._handleScroll.bind(this));
+        // this.handleScroll = $.debounce(1000, this._handleScroll.bind(this));
         window.addEventListener('scroll', this.handleScroll, true);
     }
 

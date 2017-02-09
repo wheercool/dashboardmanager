@@ -127,7 +127,6 @@ const mapDispatchToProps = (dispatch) => ({
       const offset = (newOffset - oldOffset) * scale;
       const requestedInterval = moveInterval(visibleInterval, offset)
       dispatch(widgetAction(id, moveVisibleInterval(offset)));
-
       fetchAndRender(dispatch, id, url, requestedInterval, channels, 0)
     })
   },
