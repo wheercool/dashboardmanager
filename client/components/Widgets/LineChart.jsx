@@ -68,6 +68,10 @@ class LineChartWidget extends Component {
 
     )
   }
+  componentDidMount() {
+    const {widgetCreated, id} = this.props;
+    widgetCreated(id);
+  }
 }
 
 const date = (value) => new Date(value);
@@ -120,7 +124,12 @@ const fetchAndRender = (dispatch, id, url, requrestedInterval, channels, zoom) =
   })
 }
 const mapDispatchToProps = (dispatch) => ({
-
+  widgetCreated: (id) => {
+      dispatch((dispatch, getState) => {
+        const {settings: {channels, visibleInterval, url}, data} = getState().panels[id].widget.state;
+        fetchAndRender(dispatch, id, url, visibleInterval, channels, 0)
+      });
+  },
   onScroll: (id, scale) => function(oldOffset, newOffset) {
     dispatch((dispatch, getState) => {
       const {settings: {channels, visibleInterval, url}, data} = getState().panels[id].widget.state;
