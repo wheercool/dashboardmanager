@@ -15,14 +15,17 @@ import {offsetToPercent, getFactor, getScrollerOffset} from '../../model/lineCha
 import {embraceIntervals, intervalLength,
       zoomInInterval, zoomOutInterval, moveInterval} from '../../model/interval'
 
+import LineChartSetting from '../LineChartSettings/LineChartSetting'
 
 class LineChartWidget extends Component {
   render() {
-    const {id, instanceProperties, width, height, onScroll, onZoomIn, onZoomOut} = this.props;
+    const {id, instanceProperties, width, height,
+            isEditing,
+            onScroll, onZoomIn, onZoomOut} = this.props;
     const {url, chartData, dataInterval,
           visibleInterval,
           labels, ranges, colors,
-          orientation } = instanceProperties(id)
+          orientation, channels } = instanceProperties(id)
 
     const chartWidth = width - 40,
           chartHeight = height - 150,
@@ -43,24 +46,34 @@ class LineChartWidget extends Component {
           //         width * factor)
     return (
       orientation == 'horizontal'? (
-      <div>
-          <ZoomInButton onClick={onZoomInHandler}/>
-          <ZoomOutButton onClick={onZoomOutHandler}/>
-          <HorizontalLineChart  data={chartData}
-                                min={visibleInterval.min}
-                                max={visibleInterval.max}
-                                labels={labels}
-                                ranges={ranges}
-                                colors={colors}
-                                width={chartWidth}
-                                height={chartHeight}/>
+        isEditing
+        ? (
+          <LineChartSetting channels={[]}
+                availableChannels={channels}
+                channels={channels}
+                currentFilter="All"
+                filters={["Sensor Board", "Gyro"]}/>
+        )
+        : (
+          <div>
+              <ZoomInButton onClick={onZoomInHandler}/>
+              <ZoomOutButton onClick={onZoomOutHandler}/>
+              <HorizontalLineChart  data={chartData}
+                                    min={visibleInterval.min}
+                                    max={visibleInterval.max}
+                                    labels={labels}
+                                    ranges={ranges}
+                                    colors={colors}
+                                    width={chartWidth}
+                                    height={chartHeight}/>
 
-          <Scroller width={width}
-                    orientation="horizontal"
-                    factor={visibleTotalScale}
-                    offset={scrollOffset}
-                    onScroll={onScrollHandler}/>
-        </div>
+              <Scroller width={width}
+                        orientation="horizontal"
+                        factor={visibleTotalScale}
+                        offset={scrollOffset}
+                        onScroll={onScrollHandler}/>
+            </div>
+      )
       )
       : (
         <span>Nothing</span>
@@ -106,6 +119,7 @@ const mapStateToProps = (state) => {
           minimalIntervalLenght,
           chartData: chartData.length? chartData: [R.repeat(0, labels.length)],
           url, labels, ranges, colors,
+          channels,
           orientation
         }
       }
